@@ -1,9 +1,11 @@
 /**
  * Nova Poshta API v2 Wrapper
- * Endpoint: https://api.novaposhta.ua/v2.0/json/ (proxied via /api)
+ * Endpoint: https://api.novaposhta.ua/v2.0/json/
+ * Uses Vite proxy (/api) on localhost, direct URL in production (GitHub Pages)
  */
 
-const API_URL = '/api';
+const isLocalhost = location.hostname === 'localhost' || location.hostname === '127.0.0.1';
+const API_URL = isLocalhost ? '/api' : 'https://api.novaposhta.ua/v2.0/json/';
 
 function getApiKey() {
     return localStorage.getItem('np_api_key') || '';
