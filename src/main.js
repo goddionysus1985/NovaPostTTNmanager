@@ -12,7 +12,7 @@ import { renderTracking, initTracking } from './pages/tracking.js';
 import { renderDocuments, initDocuments } from './pages/documents.js';
 import { renderSettings, initSettings } from './pages/settings.js';
 import { hasApiKey } from './api/novaposhta.js';
-import { html } from './utils/dom.js';
+import { html, rawHtml } from './utils/dom.js';
 
 const app = document.getElementById('app');
 
@@ -50,7 +50,7 @@ async function renderPage() {
       currentPage = 'dashboard';
   }
 
-  app.innerHTML = html`${renderHeader(currentPage)}${pageContent}`;
+  app.innerHTML = html`${rawHtml(renderHeader(currentPage))}${rawHtml(pageContent)}`;
 
   // Bind navigation
   bindNavigation();
