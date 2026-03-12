@@ -1,7 +1,7 @@
 import { defineConfig } from 'vite';
 
-export default defineConfig({
-  base: './',
+export default defineConfig(({ command }) => ({
+  base: command === 'build' ? '/NovaPostTTNmanager/' : '/',
   server: {
     proxy: {
       '/api': {
@@ -12,4 +12,4 @@ export default defineConfig({
       },
     },
   },
-});
+}));
