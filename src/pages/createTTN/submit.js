@@ -126,6 +126,20 @@ export async function submitTTN(navigateTo) {
         return;
     }
 
+    const isDoorRecipient = serviceType === 'WarehouseDoors' || serviceType === 'DoorsDoors';
+    if (isDoorRecipient) {
+        const streetRef = autocompletes.recipientStreet?.getValue();
+        const building = document.getElementById('recipient-building')?.value?.trim();
+        if (!streetRef) {
+            showToast('warning', 'Увага', 'Оберіть вулицю отримувача');
+            return;
+        }
+        if (!building) {
+            showToast('warning', 'Увага', 'Введіть номер будинку отримувача');
+            return;
+        }
+    }
+
     if (state.recipientType === 'PrivatePerson') {
         if (!recipientLastName || !recipientFirstName) {
             showToast('warning', 'Увага', 'Введіть прізвище та ім\'я отримувача');
@@ -242,6 +256,20 @@ export async function submitTTN(navigateTo) {
             senderAddressRef = senderAddressSelect.value;
         }
 
+        const isDoorRecipient = serviceType === 'WarehouseDoors' || serviceType === 'DoorsDoors';
+        let finalRecipientAddress = state.recipientAddressRef;
+        let recipientHouse = '';
+        let recipientFlat = '';
+
+        if (isDoorRecipient) {
+            const streetRef = autocompletes.recipientStreet?.getValue();
+            if (streetRef) {
+                finalRecipientAddress = streetRef;
+                recipientHouse = document.getElementById('recipient-building')?.value?.trim() || '';
+                recipientFlat = document.getElementById('recipient-flat')?.value?.trim() || '';
+            }
+        }
+
         const ttnParams = {
             PayerType: payerType,
             PaymentMethod: paymentMethod,
@@ -259,29 +287,17 @@ export async function submitTTN(navigateTo) {
             SendersPhone: senderPhone,
             CityRecipient: state.recipientCityRef,
             Recipient: recipientRef,
-            RecipientAddress: state.recipientAddressRef,
+            RecipientAddress: finalRecipientAddress,
             ContactRecipient: recipientContactRef,
             RecipientsPhone: recipientPhone,
         };
 
-        console.log('[TTN] Full params:', JSON.stringify(ttnParams, null, 2));
-
-        // Handle door delivery - street address
-        const isDoorRecipient = serviceType === 'WarehouseDoors' || serviceType === 'DoorsDoors';
         if (isDoorRecipient) {
-            const recipientStreetAC = autocompletes.recipientStreet;
-            const streetRef = recipientStreetAC?.getValue();
-            const building = document.getElementById('recipient-building')?.value?.trim() || '';
-            const flat = document.getElementById('recipient-flat')?.value?.trim() || '';
-
-            if (streetRef) {
-                ttnParams.RecipientAddress = '';
-                ttnParams.RecipientAddressName = building;
-                ttnParams.RecipientHouse = building;
-                ttnParams.RecipientFlat = flat;
-                ttnParams.RecipientType = 'PrivatePerson';
-            }
+            ttnParams.RecipientHouse = recipientHouse;
+            ttnParams.RecipientFlat = recipientFlat;
         }
+
+        console.log('[TTN] Full params:', JSON.stringify(ttnParams, null, 2));
 
         // Dimensions or Tires/Wheels CargoDetails
         if (cargoType === 'TiresWheels') {
