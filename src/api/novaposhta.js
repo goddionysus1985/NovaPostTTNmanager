@@ -140,6 +140,15 @@ export async function getStreet(cityRef, query) {
 }
 
 /**
+ * Save counterparty address
+ * @param {object} params CounterpartyRef, StreetRef, BuildingNumber, Flat
+ */
+export async function saveAddress(params) {
+    const data = await apiCall('Address', 'save', params);
+    return data.data?.[0] || null;
+}
+
+/**
  * Get all areas (oblasts)
  */
 export async function getAreas() {

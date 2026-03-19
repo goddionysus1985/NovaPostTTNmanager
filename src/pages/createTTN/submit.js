@@ -2,6 +2,7 @@ import {
     createCounterparty,
     createContactPerson,
     createTTN,
+    saveAddress,
     getDocumentPrice,
     getPrintUrl,
     getPrintMarkingUrl
@@ -258,15 +259,26 @@ export async function submitTTN(navigateTo) {
 
         const isDoorRecipient = serviceType === 'WarehouseDoors' || serviceType === 'DoorsDoors';
         let finalRecipientAddress = state.recipientAddressRef;
-        let recipientHouse = '';
-        let recipientFlat = '';
+        let recipientHouse = document.getElementById('recipient-building')?.value?.trim() || '';
+        let recipientFlat = document.getElementById('recipient-flat')?.value?.trim() || '';
 
         if (isDoorRecipient) {
             const streetRef = autocompletes.recipientStreet?.getValue();
             if (streetRef) {
-                finalRecipientAddress = streetRef;
-                recipientHouse = document.getElementById('recipient-building')?.value?.trim() || '';
-                recipientFlat = document.getElementById('recipient-flat')?.value?.trim() || '';
+                // For address delivery, we must create/retrieve a specific Address Ref for this counterparty.
+                // This is especially critical for Organizations (FOP).
+                const addrResult = await saveAddress({
+                    CounterpartyRef: recipientRef,
+                    StreetRef: streetRef,
+                    BuildingNumber: recipientHouse,
+                    Flat: recipientFlat
+                });
+
+                if (addrResult) {
+                    finalRecipientAddress = addrResult.Ref;
+                } else {
+                    finalRecipientAddress = streetRef;
+                }
             }
         }
 
