@@ -76,31 +76,31 @@ export async function loadSenderData() {
         }
 
         senderSection.innerHTML = html`
-      <div class="form-grid">
-        <div class="form-group">
-          <label class="form-label">Відправник</label>
-          <select class="form-select" id="sender-select">
+      <div class="compact-grid">
+        <div class="compact-form-group">
+          <label class="compact-label">Контрагент</label>
+          <select class="compact-select" id="sender-select">
             ${senders.map(s => html`<option value="${s.Ref}" ${s.Ref === sender.Ref ? 'selected' : ''}>${s.Description}</option>`)}
           </select>
         </div>
-        <div class="form-group">
-          <label class="form-label">Контактна особа</label>
-          <select class="form-select" id="sender-contact-select">
-            ${contacts.map(c => html`<option value="${c.Ref}" ${c.Ref === contact?.Ref ? 'selected' : ''}>${c.Description} (${c.Phones || ''})</option>`)}
+        <div class="compact-form-group">
+          <label class="compact-label">Контакт</label>
+          <select class="compact-select" id="sender-contact-select">
+            ${contacts.map(c => html`<option value="${c.Ref}" ${c.Ref === contact?.Ref ? 'selected' : ''}>${c.Description}</option>`)}
           </select>
         </div>
-        <div class="form-group">
-          <label class="form-label">Телефон відправника</label>
-          <input type="tel" class="form-input" id="sender-phone" value="${state.senderPhone}" placeholder="380XXXXXXXXX">
+        <div class="compact-form-group">
+          <label class="compact-label">Телефон</label>
+          <input type="tel" class="compact-input" id="sender-phone" value="${state.senderPhone}" placeholder="380XXXXXXXXX">
         </div>
-        <div class="form-group" id="sender-city-group">
-          <label class="form-label">Місто відправника <span class="required">*</span></label>
+        <div class="compact-form-group" id="sender-city-group">
+          <label class="compact-label">Місто <span class="required">*</span></label>
           <!-- autocomplete injected -->
         </div>
-        <div class="form-group" id="sender-warehouse-group">
-          <label class="form-label">Відділення відправника <span class="required">*</span></label>
+      </div>
+      <div class="compact-form-group" id="sender-warehouse-group" style="margin-top: 10px;">
+          <label class="compact-label">Відділення <span class="required">*</span></label>
           <!-- autocomplete injected -->
-        </div>
       </div>
     `;
 

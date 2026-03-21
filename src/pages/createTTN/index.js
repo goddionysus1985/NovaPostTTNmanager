@@ -42,9 +42,9 @@ function updateAddressFields() {
 
 function updateSummary() {
     const serviceLabels = {
-        'WarehouseWarehouse': 'Склад → Склад',
-        'WarehouseDoors': 'Склад → Адреса',
-        'DoorsWarehouse': 'Адреса → Склад',
+        'WarehouseWarehouse': 'Відділення → Відділення',
+        'WarehouseDoors': 'Відділення → Адреса',
+        'DoorsWarehouse': 'Адреса → Відділення',
         'DoorsDoors': 'Адреса → Адреса',
     };
     const payerLabels = {
@@ -63,11 +63,17 @@ function updateSummary() {
     const serviceType = document.getElementById('service-type')?.value || 'WarehouseWarehouse';
     const payerType = document.getElementById('payer-type')?.value || 'Sender';
     const cargoType = document.getElementById('cargo-type')?.value || 'Parcel';
-    const weight = document.getElementById('cargo-weight')?.value || '1';
-    const seats = document.getElementById('cargo-seats')?.value || '1';
+    const weight = state.places.reduce((sum, p) => sum + (parseFloat(p.weight) || 0), 0) || '1';
+    const seats = state.places.length || '1';
     const cost = document.getElementById('cargo-cost')?.value || '300';
     const backwardValue = document.getElementById('backward-value')?.value || '';
     const backwardEnabled = document.getElementById('backward-enabled')?.checked || false;
+
+    // Update hidden fields for submit.js compatibility
+    const hw = document.getElementById('cargo-weight');
+    if (hw) hw.value = weight;
+    const hs = document.getElementById('cargo-seats');
+    if (hs) hs.value = seats;
 
     const setEl = (id, text) => {
         const el = document.getElementById(id);
@@ -80,55 +86,99 @@ function updateSummary() {
     setEl('sum-weight', `${weight} кг`);
     setEl('sum-seats', seats);
     setEl('sum-cost', `${cost} грн`);
-    setEl('sum-cod', backwardEnabled && backwardValue ? `${backwardValue} грн` : '—');
+    
+    // Updates for sidebar sums
+    setEl('sum-parts', '520 USD'); // Mock value from UI
+    setEl('sum-advance', `${cost} грн`);
+    setEl('sum-delivery-cost', '—'); 
 }
 
 function updateDimensionsContainer() {
     const container = document.getElementById('dimensions-container');
     if (!container) return;
 
-    const seats = parseInt(document.getElementById('cargo-seats')?.value) || 1;
+    let html = '';
+    state.places.forEach((place, index) => {
+        html += `
+            <tr class="dimension-row" data-index="${index}">
+              <td>
+                <div class="dimension-input-group">
+                  <input type="number" class="compact-input cargo-length" value="${place.length}" placeholder="Д" title="Довжина">
+                  <input type="number" class="compact-input cargo-width" value="${place.width}" placeholder="Ш" title="Ширина">
+                  <input type="number" class="compact-input cargo-height" value="${place.height}" placeholder="В" title="Висота">
+                </div>
+              </td>
+              <td>
+                   <input type="number" class="compact-input cargo-weight-place" value="${place.weight}" placeholder="Вес, кг">
+              </td>
+              <td style="text-align:center;">
+                  <label class="switch">
+                    <input type="checkbox" class="special-cargo-toggle" ${place.specialCargo ? 'checked' : ''}>
+                    <span class="slider"></span>
+                  </label>
+              </td>
+              <td>
+                  ${index > 0 ? `<button class="btn-remove-place" data-index="${index}">✕</button>` : ''}
+              </td>
+            </tr>
+        `;
+    });
+    container.innerHTML = html;
 
-    // Save existing values to not lose them
-    const existingValues = [];
-    container.querySelectorAll('.dimension-row').forEach((row, idx) => {
-        existingValues[idx] = {
-            width: row.querySelector('.cargo-width').value,
-            length: row.querySelector('.cargo-length').value,
-            height: row.querySelector('.cargo-height').value,
-            weight: row.querySelector('.cargo-weight-place').value
-        };
+    // Attach listeners
+    container.querySelectorAll('.dimension-row').forEach(row => {
+        const idx = row.dataset.index;
+        const inputs = row.querySelectorAll('input');
+        inputs.forEach(input => {
+            input.addEventListener('change', () => {
+                state.places[idx].length = row.querySelector('.cargo-length').value;
+                state.places[idx].width = row.querySelector('.cargo-width').value;
+                state.places[idx].height = row.querySelector('.cargo-height').value;
+                state.places[idx].weight = row.querySelector('.cargo-weight-place').value;
+                state.places[idx].specialCargo = row.querySelector('.special-cargo-toggle').checked;
+                
+                checkSpecialCargo();
+                updateSummary();
+            });
+            input.addEventListener('input', () => {
+                state.places[idx].weight = row.querySelector('.cargo-weight-place').value;
+                updateSummary();
+            });
+        });
+
+        const removeBtn = row.querySelector('.btn-remove-place');
+        if (removeBtn) {
+            removeBtn.addEventListener('click', () => {
+                state.places.splice(idx, 1);
+                updateDimensionsContainer();
+                updateSummary();
+            });
+        }
     });
 
-    let html = '';
-    for (let i = 0; i < seats; i++) {
-        const val = existingValues[i] || { width: '', length: '', height: '', weight: '' };
-        html += `
-            <div class="dimension-row" style="margin-bottom: var(--space-md); padding: var(--space-sm); border: 1px dashed var(--border-color); border-radius: var(--radius-sm);">
-              <div style="font-weight: 600; font-size: var(--font-size-sm); margin-bottom: var(--space-sm); color: var(--text-secondary);">Місце ${i + 1}</div>
-              <div class="form-grid cols-3" style="margin-bottom: var(--space-sm);">
-                <div class="form-group">
-                  <label class="form-label">Ширина, см</label>
-                  <input type="number" class="form-input cargo-width" value="${val.width}" placeholder="0" min="0">
-                </div>
-                <div class="form-group">
-                  <label class="form-label">Довжина, см</label>
-                  <input type="number" class="form-input cargo-length" value="${val.length}" placeholder="0" min="0">
-                </div>
-                <div class="form-group">
-                  <label class="form-label">Висота, см</label>
-                  <input type="number" class="form-input cargo-height" value="${val.height}" placeholder="0" min="0">
-                </div>
-              </div>
-              <div class="form-group" style="margin-bottom: 0;">
-                  <label class="form-label">Фактична вага місця, кг (якщо відрізняється)</label>
-                  <input type="number" class="form-input cargo-weight-place" value="${val.weight}" placeholder="За замовчуванням: Загальна вага / кількість місць" min="0" step="0.1">
-              </div>
-            </div>
-        `;
-    }
-    container.innerHTML = html;
+    checkSpecialCargo();
 }
+
+/**
+ * If any place is SpecialCargo, ship type must be "Cargo"
+ */
+function checkSpecialCargo() {
+    const isAnySpecial = state.places.some(p => p.specialCargo);
+    const cargoTypeEl = document.getElementById('cargo-type');
+    if (isAnySpecial && cargoTypeEl) {
+        if (cargoTypeEl.value !== 'Cargo') {
+            cargoTypeEl.value = 'Cargo';
+            updateSummary();
+        }
+    }
+}
+
+function addPlace() {
+    state.places.push({ width: '', length: '', height: '', weight: '', specialCargo: false });
+    updateDimensionsContainer();
+    updateSummary();
+}
+
 
 export function initCreateTTN(navigateTo) {
     if (!hasApiKey()) return;
@@ -165,25 +215,28 @@ export function initCreateTTN(navigateTo) {
         });
     });
 
-    // Backward delivery toggle
-    const backwardEnabled = document.getElementById('backward-enabled');
-    if (backwardEnabled) {
-        backwardEnabled.addEventListener('change', () => {
-            state.backwardDeliveryEnabled = backwardEnabled.checked;
-            const section = document.getElementById('backward-section');
-            section.style.display = backwardEnabled.checked ? '' : 'none';
-            if (backwardEnabled.checked) section.classList.add('active');
-            else section.classList.remove('active');
-            updateSummary();
+    // Global SpecialCargo toggle
+    const globalSCToggle = document.getElementById('special-cargo-toggle-global');
+    if (globalSCToggle) {
+        globalSCToggle.addEventListener('change', () => {
+            state.places.forEach(p => p.specialCargo = globalSCToggle.checked);
+            updateDimensionsContainer();
         });
     }
 
-    // Backward type change
-    const backwardType = document.getElementById('backward-type');
-    if (backwardType) {
-        backwardType.addEventListener('change', () => {
-            const valGroup = document.getElementById('backward-value-group');
-            valGroup.style.display = backwardType.value === 'Money' ? '' : 'none';
+    // Add place button
+    const addPlaceBtn = document.getElementById('btn-add-place');
+    if (addPlaceBtn) addPlaceBtn.addEventListener('click', addPlace);
+
+    // Backward delivery toggle (simplified for compact view)
+    const backwardValueEl = document.getElementById('backward-value');
+    const backwardEnabledEl = document.getElementById('backward-enabled');
+    if (backwardValueEl && backwardEnabledEl) {
+        backwardValueEl.addEventListener('input', () => {
+            const val = parseFloat(backwardValueEl.value) || 0;
+            backwardEnabledEl.checked = val > 0;
+            state.backwardDeliveryEnabled = val > 0;
+            updateSummary();
         });
     }
 
@@ -195,7 +248,6 @@ export function initCreateTTN(navigateTo) {
         if (el) {
             el.addEventListener('change', () => {
                 updateSummary();
-                if (id === 'cargo-seats') updateDimensionsContainer();
                 if (id === 'cargo-type') {
                     const twGroup = document.getElementById('tires-wheels-group');
                     if (twGroup) twGroup.style.display = el.value === 'TiresWheels' ? 'block' : 'none';
@@ -203,7 +255,6 @@ export function initCreateTTN(navigateTo) {
             });
             el.addEventListener('input', () => {
                 updateSummary();
-                if (id === 'cargo-seats') updateDimensionsContainer();
             });
         }
     });
@@ -212,8 +263,10 @@ export function initCreateTTN(navigateTo) {
     updateDimensionsContainer();
 
     // Calculate price
-    const calcBtn = document.getElementById('calc-price-btn');
-    if (calcBtn) calcBtn.addEventListener('click', calculatePrice);
+    ['calc-price-btn', 'btn-calc-price-alt'].forEach(id => {
+        const btn = document.getElementById(id);
+        if (btn) btn.addEventListener('click', calculatePrice);
+    });
 
     // Submit
     const submitBtn = document.getElementById('submit-ttn-btn');

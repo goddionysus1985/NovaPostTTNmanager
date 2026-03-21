@@ -34,6 +34,11 @@ export const state = {
     volumetricWidth: '',
     volumetricLength: '',
     volumetricHeight: '',
+    
+    // Multiple places
+    places: [
+      { width: '', length: '', height: '', weight: '', specialCargo: false }
+    ],
 
     // Backward delivery
     backwardDeliveryEnabled: false,
