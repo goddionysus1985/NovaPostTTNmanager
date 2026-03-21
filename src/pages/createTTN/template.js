@@ -56,6 +56,11 @@ export function renderCreateTTN() {
           z-index: 101;
           position: relative;
         }
+
+        .autocomplete-wrapper:has(.autocomplete-dropdown.show) {
+          z-index: 102;
+          position: relative;
+        }
         
         .compact-card-header {
           font-size: var(--font-size-sm);

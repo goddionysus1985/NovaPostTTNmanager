@@ -509,6 +509,10 @@ a:hover {
     z-index: 1;
 }
 
+.autocomplete-wrapper:has(.autocomplete-dropdown.show) {
+    z-index: 100 !important;
+}
+
 /* When a dropdown is open, raise the parent card above siblings */
 .card:has(.autocomplete-dropdown.show) {
     z-index: 10;
