@@ -4,8 +4,15 @@
  * Uses Vite proxy (/api) on localhost, direct URL in production (GitHub Pages)
  */
 
+import { withCache, cacheClear } from '../utils/cache.js';
+
 const isLocalhost = location.hostname === 'localhost' || location.hostname === '127.0.0.1';
 const API_URL = isLocalhost ? '/api' : 'https://api.novaposhta.ua/v2.0/json/';
+
+/** Clear all cached API responses (useful after API key change) */
+export function clearApiCache() {
+    cacheClear();
+}
 
 function getApiKey() {
     return localStorage.getItem('np_api_key') || '';
@@ -67,11 +74,8 @@ async function apiCall(modelName, calledMethod, methodProperties = {}) {
     return data;
 }
 
-// Simple in-memory cache to prevent "Too many requests" errors
-const apiCache = new Map();
-
 /**
- * Wrapper for API calls with caching
+ * Wrapper for API calls with persistent localStorage caching.
  * @param {string} modelName 
  * @param {string} calledMethod 
  * @param {object} methodProperties 
@@ -79,22 +83,8 @@ const apiCache = new Map();
  * @returns {Promise<any>}
  */
 async function cachedApiCall(modelName, calledMethod, methodProperties = {}, ttlMs = 5 * 60 * 1000) {
-    const cacheKey = JSON.stringify({ modelName, calledMethod, methodProperties });
-    const now = Date.now();
-
-    if (apiCache.has(cacheKey)) {
-        const cached = apiCache.get(cacheKey);
-        if (now - cached.timestamp < ttlMs) {
-            console.log(`[NP API] 📦 CACHED → ${modelName}.${calledMethod}`, methodProperties);
-            return cached.data;
-        } else {
-            apiCache.delete(cacheKey);
-        }
-    }
-
-    const data = await apiCall(modelName, calledMethod, methodProperties);
-    apiCache.set(cacheKey, { timestamp: now, data });
-    return data;
+    const cacheKey = `np_${modelName}_${calledMethod}_${JSON.stringify(methodProperties)}`;
+    return withCache(cacheKey, () => apiCall(modelName, calledMethod, methodProperties), ttlMs);
 }
 
 /* ========================================
@@ -116,13 +106,15 @@ export async function searchSettlements(query, limit = 20) {
 /**
  * Get warehouses (departments, postomats) by city
  */
-export async function getWarehouses(cityRef, searchQuery = '', typeOfWarehouseRef = '') {
+export async function getWarehouses(cityRef, searchQuery = '', typeOfWarehouseRef = '', page = 1) {
     const props = { CityRef: cityRef };
     if (searchQuery) props.FindByString = searchQuery;
     if (typeOfWarehouseRef) props.TypeOfWarehouseRef = typeOfWarehouseRef;
-    props.Limit = '50';
-    props.Page = '1';
-    const data = await cachedApiCall('Address', 'getWarehouses', props);
+    props.Limit = '200';
+    props.Page = String(page);
+    // Use shorter TTL when a search query is active (more dynamic results)
+    const ttl = searchQuery ? 2 * 60 * 1000 : 10 * 60 * 1000;
+    const data = await cachedApiCall('Address', 'getWarehouses', props, ttl);
     return data.data || [];
 }
 

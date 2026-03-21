@@ -2,7 +2,7 @@
  * Settings Page
  */
 
-import { setApiKey, hasApiKey } from '../api/novaposhta.js';
+import { setApiKey, hasApiKey, clearApiCache } from '../api/novaposhta.js';
 import { showToast } from '../components/toast.js';
 import { html } from '../utils/dom.js';
 
@@ -56,6 +56,7 @@ export function renderSettings() {
           <div class="btn-group">
             <button class="btn btn-secondary" id="export-settings-btn">📤 Експорт налаштувань</button>
             <button class="btn btn-secondary" id="import-settings-btn">📥 Імпорт налаштувань</button>
+            <button class="btn btn-secondary" id="clear-cache-btn">🗂️ Очистити кеш API</button>
             <button class="btn btn-danger" id="clear-data-btn">🗑️ Очистити дані</button>
           </div>
           <input type="file" id="import-file-input" accept=".json" style="display:none;">
@@ -99,6 +100,7 @@ export function initSettings(navigateTo) {
         return;
       }
       setApiKey(key);
+      clearApiCache(); // flush stale API responses after key change
       showToast('success', 'Збережено', 'API ключ успішно збережено');
       if (navigateTo) navigateTo('settings');
     });
@@ -172,13 +174,23 @@ export function initSettings(navigateTo) {
     });
   }
 
+  // Clear API cache
+  const clearCacheBtn = document.getElementById('clear-cache-btn');
+  if (clearCacheBtn) {
+    clearCacheBtn.addEventListener('click', () => {
+      clearApiCache();
+      showToast('success', 'Готово', 'Кеш API очищено. Дані будуть завантажені заново.');
+    });
+  }
+
   // Clear data
   const clearBtn = document.getElementById('clear-data-btn');
   if (clearBtn) {
     clearBtn.addEventListener('click', () => {
-      if (confirm('Видалити всі дані додатку? API ключ, історію пошуку тощо?')) {
+      if (confirm('Видалити всі дані додатку? API ключ, кеш та історію пошуку?')) {
         localStorage.removeItem('np_api_key');
         localStorage.removeItem('np_tracking_history');
+        clearApiCache();
         showToast('info', 'Очищено', 'Всі дані видалено');
         if (navigateTo) navigateTo('settings');
       }
