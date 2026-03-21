@@ -53,7 +53,7 @@ export function normalizePhone(phone) {
  * @param {string} descValue
  * @returns {string|null}
  */
-function validateForm(serviceType, recipientPhone, descValue) {
+function validateForm(serviceType, recipientPhone, descValue, cargoType) {
     if (!state.senderRef || !state.senderContactRef) {
         return 'Оберіть відправника та контактну особу';
     }
@@ -79,6 +79,26 @@ function validateForm(serviceType, recipientPhone, descValue) {
 
     if (!recipientPhone) return 'Введіть телефон отримувача';
     if (!descValue) return 'Введіть опис вантажу';
+
+    // Costs and Backward Delivery validation
+    const cost = parseFloat(document.getElementById('cargo-cost')?.value) || 0;
+    const backwardValueStr = document.getElementById('backward-value')?.value || '0';
+    const backwardValue = parseFloat(backwardValueStr) || 0;
+    const paymentMethod = document.getElementById('payment-method')?.value || 'Cash';
+
+    if (cost <= 0) return 'Вкажіть оголошену вартість';
+
+    if (state.backwardDeliveryEnabled) {
+        if (backwardValue <= 0) return 'Вкажіть суму післяплати (більше 0)';
+        if (backwardValue > cost) return 'Сума післяплати не може бути більшою за оголошену вартість';
+        if (cargoType === 'Documents') return 'Послуга Післяплата недоступна для документів';
+        
+        // NonCash + Afterплата is risky without manual confirmation
+        if (paymentMethod === 'NonCash') {
+            const ok = confirm('Послуга "Післяплата" при безготівковій оплаті доступна тільки за наявності договору на "Контроль оплати". Продовжити?');
+            if (!ok) return 'Скасовано користувачем';
+        }
+    }
 
     return null;
 }
@@ -361,7 +381,7 @@ export async function submitTTN(navigateTo) {
     const descValue = cargoDescAC?.input?.value?.trim() || '';
 
     // ── 2. Validate ──
-    const validationError = validateForm(serviceType, recipientPhone, descValue);
+    const validationError = validateForm(serviceType, recipientPhone, descValue, cargoType);
     if (validationError) {
         showToast('warning', 'Увага', validationError);
         return;

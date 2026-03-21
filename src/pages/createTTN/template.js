@@ -258,9 +258,9 @@ export function renderCreateTTN() {
                 <div class="spinner spinner-sm"></div>
             </div>
 
-            <div class="compact-grid" style="margin-top: var(--space-md); margin-bottom: var(--space-md); grid-template-columns: 1fr 1fr;">
+            <div class="compact-grid" style="margin-top: var(--space-md); margin-bottom: var(--space-md); grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));">
               <div class="compact-form-group">
-                <label class="compact-label">Тип відправлення <span class="required">*</span></label>
+                <label class="compact-label">Тип вантажу <span class="required">*</span></label>
                 <select class="compact-select" id="cargo-type">
                   <option value="Parcel">Посилка</option>
                   <option value="Cargo">Вантаж</option>
@@ -269,11 +269,18 @@ export function renderCreateTTN() {
                 </select>
               </div>
               <div class="compact-form-group">
-                <label class="compact-label">Платник доставки <span class="required">*</span></label>
+                <label class="compact-label">Платник <span class="required">*</span></label>
                 <select class="compact-select" id="payer-type">
                   <option value="Recipient" selected>Отримувач</option>
                   <option value="Sender">Відправник</option>
                   <option value="ThirdPerson">Третя особа</option>
+                </select>
+              </div>
+              <div class="compact-form-group">
+                <label class="compact-label">Форма оплати <span class="required">*</span></label>
+                <select class="compact-select" id="payment-method">
+                  <option value="Cash" selected>Готівкова</option>
+                  <option value="NonCash">Безготівкова</option>
                 </select>
               </div>
             </div>
@@ -423,19 +430,38 @@ export function renderCreateTTN() {
             <div class="summary-list">
                 <div class="compact-form-group" style="margin-top: 10px;">
                     <label class="compact-label">Оголошена цінність, UAH <span class="required">*</span></label>
-                    <input type="number" class="compact-input" id="cargo-cost" value="" placeholder="0">
+                    <input type="number" class="compact-input" id="cargo-cost" value="200" placeholder="200">
                 </div>
                 
                 <div class="compact-form-group" style="margin-top: 10px;">
-                    <label class="compact-label">Наложений платіж, UAH / факт. <span class="required">*</span></label>
-                    <div style="display: flex; align-items: center; gap: 8px;">
-                        <input type="number" class="compact-input" id="backward-value" value="0,00">
-                        <span style="font-size: 12px; font-weight: 600;">UAH</span>
+                    <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 4px;">
+                        <label class="compact-label" style="margin: 0; cursor: pointer;" for="backward-enabled">Зворотна доставка</label>
+                        <label class="switch">
+                            <input type="checkbox" id="backward-enabled">
+                            <span class="slider"></span>
+                        </label>
                     </div>
-                    <!-- hidden state for backward delivery -->
-                    <input type="checkbox" id="backward-enabled" style="display:none;">
+                </div>
+                
+                <div id="backward-value-container" style="display: none;">
+                    <div class="compact-form-group">
+                        <label class="compact-label">Сума післяплати, UAH <span class="required">*</span></label>
+                        <div style="display: flex; align-items: center; gap: 8px;">
+                            <input type="number" class="compact-input" id="backward-value" value="0">
+                            <span style="font-size: 12px; font-weight: 600;">UAH</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="compact-form-group" style="margin-top: 10px; padding-top: 10px; border-top: 1px dashed var(--border-color);">
+                    <div class="summary-item"><span class="summary-label">Послуга:</span> <span class="summary-value" id="sum-service">—</span></div>
+                    <div class="summary-item"><span class="summary-label">Платник:</span> <span class="summary-value" id="sum-payer">—</span></div>
+                    <div class="summary-item"><span class="summary-label">Оплата:</span> <span class="summary-value" id="sum-payment">—</span></div>
+                    <div class="summary-item"><span class="summary-label">Вага:</span> <span class="summary-value" id="sum-weight">0 кг</span></div>
+                    <div class="summary-item" id="sum-backward-row" style="display: none;"><span class="summary-label">Післяплата:</span> <span class="summary-value" id="sum-backward">—</span></div>
                 </div>
             </div>
+
             
             <div id="price-estimate" style="margin-top: 15px;">
                 <button class="btn btn-ghost btn-sm btn-block" id="calc-price-btn">💲 Розрахувати вартість доставки</button>
@@ -448,7 +474,6 @@ export function renderCreateTTN() {
       <!-- Hidden/unused fields that might be needed by index.js logic -->
       <div style="display:none;">
           <input type="text" id="send-date" value="${state.dateTime}">
-          <select id="payment-method"><option value="Cash">Cash</option></select>
           <input type="number" id="cargo-weight" value="1">
           <input type="number" id="cargo-seats" value="1">
           <textarea id="note"></textarea>

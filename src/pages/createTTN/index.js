@@ -52,6 +52,10 @@ function updateSummary() {
         'Recipient': 'Отримувач',
         'ThirdPerson': 'Третя особа',
     };
+    const paymentLabels = {
+        'Cash': 'Готівка',
+        'NonCash': 'Безготівкова',
+    };
     const cargoLabels = {
         'Parcel': 'Посилка',
         'Cargo': 'Вантаж',
@@ -62,6 +66,7 @@ function updateSummary() {
 
     const serviceType = document.getElementById('service-type')?.value || 'WarehouseWarehouse';
     const payerType = document.getElementById('payer-type')?.value || 'Sender';
+    const paymentMethod = document.getElementById('payment-method')?.value || 'Cash';
     const cargoType = document.getElementById('cargo-type')?.value || 'Parcel';
     const weight = state.places.reduce((sum, p) => sum + (parseFloat(p.weight) || 0), 0) || '1';
     const seats = state.places.length || '1';
@@ -75,19 +80,45 @@ function updateSummary() {
     const hs = document.getElementById('cargo-seats');
     if (hs) hs.value = seats;
 
-    const setEl = (id, text) => {
+    // Sync Cost and BackwardValue (Cost must be >= BackwardValue)
+    const costInput = document.getElementById('cargo-cost');
+    const numCost = parseFloat(cost) || 0;
+    const numBack = parseFloat(backwardValue) || 0;
+    
+    if (backwardEnabled && numBack > numCost && costInput) {
+        costInput.value = numBack;
+    }
+
+    const setEl = (id, text, isError = false) => {
         const el = document.getElementById(id);
-        if (el) el.textContent = text;
+        if (el) {
+            el.textContent = text;
+            el.style.color = isError ? 'var(--danger-color)' : '';
+        }
     };
 
     setEl('sum-service', serviceLabels[serviceType] || serviceType);
     setEl('sum-payer', payerLabels[payerType] || payerType);
+    setEl('sum-payment', paymentLabels[paymentMethod] || paymentMethod);
     setEl('sum-cargo', cargoLabels[cargoType] || cargoType);
     setEl('sum-weight', `${weight} кг`);
     setEl('sum-seats', seats);
-    setEl('sum-cost', `${cost} грн`);
     
-    // No sidebar sums anymore
+    // Warnings for common errors
+    if (cargoType === 'Documents' && backwardEnabled) {
+        setEl('sum-cargo', `${cargoLabels[cargoType]} (Післяплата недоступна для документів!)`, true);
+    }
+    if (paymentMethod === 'NonCash' && backwardEnabled) {
+        setEl('sum-payment', `${paymentLabels[paymentMethod]} (Післяплата потребує договору!)`, true);
+    }
+
+    setEl('sum-cost', `${costInput?.value || cost} грн`);
+    
+    const backwardRow = document.getElementById('sum-backward-row');
+    if (backwardRow) {
+        backwardRow.style.display = backwardEnabled ? 'flex' : 'none';
+        setEl('sum-backward', `${numBack} грн`);
+    }
 }
 
 function updateDimensionsContainer() {
@@ -235,14 +266,30 @@ export function initCreateTTN(navigateTo) {
     const addPlaceBtn = document.getElementById('btn-add-place');
     if (addPlaceBtn) addPlaceBtn.addEventListener('click', addPlace);
 
-    // Backward delivery toggle (simplified for compact view)
-    const backwardValueEl = document.getElementById('backward-value');
+    // Backward delivery toggle
     const backwardEnabledEl = document.getElementById('backward-enabled');
-    if (backwardValueEl && backwardEnabledEl) {
+    const backwardValueEl = document.getElementById('backward-value');
+    const backwardValueContainer = document.getElementById('backward-value-container');
+
+    if (backwardEnabledEl) {
+        backwardEnabledEl.addEventListener('change', () => {
+            const isEnabled = backwardEnabledEl.checked;
+            state.backwardDeliveryEnabled = isEnabled;
+            if (backwardValueContainer) {
+                backwardValueContainer.style.display = isEnabled ? 'block' : 'none';
+            }
+            
+            // If just enabled, set default value from cargo-cost if it's 0
+            if (isEnabled && backwardValueEl && (parseFloat(backwardValueEl.value) || 0) === 0) {
+                backwardValueEl.value = document.getElementById('cargo-cost')?.value || '200';
+            }
+            
+            updateSummary();
+        });
+    }
+
+    if (backwardValueEl) {
         backwardValueEl.addEventListener('input', () => {
-            const val = parseFloat(backwardValueEl.value) || 0;
-            backwardEnabledEl.checked = val > 0;
-            state.backwardDeliveryEnabled = val > 0;
             updateSummary();
         });
     }
