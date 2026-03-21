@@ -159,10 +159,18 @@ function checkSpecialCargo() {
     const globalSCToggle = document.getElementById('special-cargo-toggle-global');
     const isAnySpecial = globalSCToggle?.checked || false;
     const cargoTypeEl = document.getElementById('cargo-type');
-    if (isAnySpecial && cargoTypeEl) {
-        if (cargoTypeEl.value !== 'Cargo') {
-            cargoTypeEl.value = 'Cargo';
-            updateSummary();
+    if (cargoTypeEl) {
+        if (isAnySpecial) {
+            if (cargoTypeEl.value !== 'Cargo') {
+                cargoTypeEl.value = 'Cargo';
+                updateSummary();
+            }
+        } else {
+            // Revert to Parcel if special cargo was disabled
+            if (cargoTypeEl.value === 'Cargo') {
+                cargoTypeEl.value = 'Parcel';
+                updateSummary();
+            }
         }
     }
 }
