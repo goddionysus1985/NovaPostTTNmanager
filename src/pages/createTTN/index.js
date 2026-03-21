@@ -65,7 +65,7 @@ function updateSummary() {
     const cargoType = document.getElementById('cargo-type')?.value || 'Parcel';
     const weight = state.places.reduce((sum, p) => sum + (parseFloat(p.weight) || 0), 0) || '1';
     const seats = state.places.length || '1';
-    const cost = document.getElementById('cargo-cost')?.value || '300';
+    const cost = document.getElementById('cargo-cost')?.value || '0';
     const backwardValue = document.getElementById('backward-value')?.value || '';
     const backwardEnabled = document.getElementById('backward-enabled')?.checked || false;
 
@@ -111,12 +111,6 @@ function updateDimensionsContainer() {
               <td>
                    <input type="number" class="compact-input cargo-weight-place" value="${place.weight}" placeholder="Вес, кг">
               </td>
-              <td style="text-align:center;">
-                  <label class="switch">
-                    <input type="checkbox" class="special-cargo-toggle" ${place.specialCargo ? 'checked' : ''}>
-                    <span class="slider"></span>
-                  </label>
-              </td>
               <td>
                   ${index > 0 ? `<button class="btn-remove-place" data-index="${index}">✕</button>` : ''}
               </td>
@@ -135,7 +129,6 @@ function updateDimensionsContainer() {
                 state.places[idx].width = row.querySelector('.cargo-width').value;
                 state.places[idx].height = row.querySelector('.cargo-height').value;
                 state.places[idx].weight = row.querySelector('.cargo-weight-place').value;
-                state.places[idx].specialCargo = row.querySelector('.special-cargo-toggle').checked;
                 
                 checkSpecialCargo();
                 updateSummary();
@@ -163,7 +156,8 @@ function updateDimensionsContainer() {
  * If any place is SpecialCargo, ship type must be "Cargo"
  */
 function checkSpecialCargo() {
-    const isAnySpecial = state.places.some(p => p.specialCargo);
+    const globalSCToggle = document.getElementById('special-cargo-toggle-global');
+    const isAnySpecial = globalSCToggle?.checked || false;
     const cargoTypeEl = document.getElementById('cargo-type');
     if (isAnySpecial && cargoTypeEl) {
         if (cargoTypeEl.value !== 'Cargo') {
@@ -219,8 +213,8 @@ export function initCreateTTN(navigateTo) {
     const globalSCToggle = document.getElementById('special-cargo-toggle-global');
     if (globalSCToggle) {
         globalSCToggle.addEventListener('change', () => {
-            state.places.forEach(p => p.specialCargo = globalSCToggle.checked);
-            updateDimensionsContainer();
+            checkSpecialCargo();
+            updateSummary();
         });
     }
 

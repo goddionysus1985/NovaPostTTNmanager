@@ -59,7 +59,7 @@ export function renderCreateTTN() {
         
         .compact-grid {
           display: grid;
-          grid-template-columns: repeat(4, 1fr);
+          grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
           gap: var(--space-sm);
         }
         
@@ -202,6 +202,30 @@ export function renderCreateTTN() {
           font-weight: 600;
           color: var(--text-primary);
         }
+        
+        /* Tabs Styling */
+        .tab-btn {
+          background: rgba(51, 65, 85, 0.4);
+          border: 1px solid var(--border-color);
+          color: var(--text-muted);
+          cursor: pointer;
+          border-radius: 4px;
+          transition: 0.2s;
+          padding: 6px 16px;
+          font-size: 13px;
+          font-weight: 600;
+        }
+        
+        .tab-btn:hover {
+          background: rgba(51, 65, 85, 0.6);
+          color: var(--text-primary);
+        }
+        
+        .tab-btn.active {
+          background: var(--accent);
+          color: white;
+          border-color: var(--accent);
+        }
       </style>
 
       <div class="create-ttn-grid">
@@ -211,13 +235,13 @@ export function renderCreateTTN() {
           <!-- Package Info -->
           <div class="compact-card">
             <div class="compact-card-header">Інформація про посилку</div>
-            <div class="compact-grid" style="margin-bottom: var(--space-md);">
-              <div class="compact-form-group" id="sender-section-container">
-                <label class="compact-label">Відправник <span class="required">*</span></label>
-                <div id="sender-section">
-                  <div class="spinner spinner-sm"></div>
-                </div>
-              </div>
+            
+            <div id="sender-section">
+                <!-- Populated by loadSenderData -->
+                <div class="spinner spinner-sm"></div>
+            </div>
+
+            <div class="compact-grid" style="margin-top: var(--space-md); margin-bottom: var(--space-md); grid-template-columns: 1fr 1fr;">
               <div class="compact-form-group">
                 <label class="compact-label">Тип відправлення <span class="required">*</span></label>
                 <select class="compact-select" id="cargo-type">
@@ -234,12 +258,6 @@ export function renderCreateTTN() {
                   <option value="Sender">Відправник</option>
                   <option value="ThirdPerson">Третя особа</option>
                 </select>
-              </div>
-              <div class="compact-form-group">
-                <label class="compact-label">Відділення НП <span class="required">*</span></label>
-                <div id="sender-address-container">
-                  <div class="spinner spinner-sm"></div>
-                </div>
               </div>
             </div>
             <div class="compact-form-group" id="cargo-desc-group">
@@ -271,10 +289,9 @@ export function renderCreateTTN() {
             <table class="places-table">
               <thead>
                 <tr>
-                  <th style="width: 40%;">Розміри, см (Д/Ш/В)</th>
-                  <th style="width: 25%;">Вага, кг</th>
-                  <th style="width: 25%;">SpecialCargo</th>
-                  <th style="width: 10%;"></th>
+                  <th style="width: 50%;">Розміри, см (Д/Ш/В)</th>
+                  <th style="width: 30%;">Вага, кг</th>
+                  <th style="width: 20%;"></th>
                 </tr>
               </thead>
               <tbody id="dimensions-container">
@@ -289,10 +306,8 @@ export function renderCreateTTN() {
           </div>
           
           <!-- Actions footer -->
-          <div class="compact-card" style="display: flex; align-items: center; justify-content: space-between; gap: var(--space-md);">
-            <div style="display: flex; gap: var(--space-sm);">
-                <button class="btn btn-primary" id="save-draft-btn" disabled>✔️ Зберегти</button>
-                <button class="btn btn-success" id="submit-ttn-btn" style="background: #f97316; border-color: #ea580c;">+ Створити НП</button>
+          <div class="compact-card" style="display: flex; align-items: center; justify-content: flex-start; gap: var(--space-md);">
+                <button class="btn btn-success" id="submit-ttn-btn" style="background: #f97316; border-color: #ea580c; padding: 10px 40px;">+ Створити НП</button>
                 
                 <label class="switch-container" style="display: flex; align-items: center; gap: 8px; margin-left: 10px;">
                     <label class="switch">
@@ -301,9 +316,6 @@ export function renderCreateTTN() {
                     </label>
                     <span style="font-size: 11px; color: var(--text-muted);">SpecialCargo (РО)</span>
                 </label>
-            </div>
-            
-            <button class="btn btn-danger" id="delete-ttn-btn" style="background: #0ea5e9; border-color: #0284c7; color: white;">🗑️ Видалити ТТН</button>
           </div>
 
         </div>
@@ -313,20 +325,40 @@ export function renderCreateTTN() {
           
           <!-- Client/Recipient Card -->
           <div class="compact-card">
-            <div class="compact-card-header">Отримувач</div>
-            
-            <div class="compact-form-group sidebar-group">
-                <label class="compact-label">ФІО клієнта <span class="required">*</span></label>
-                <input type="text" class="compact-input" id="recipient-full-name-search" placeholder="Пошук клієнта...">
+            <div class="compact-card-header" style="flex-direction: column; align-items: flex-start; gap: 8px;">
+                <span>Отримувач</span>
+                <div class="tabs tabs-sm" id="recipient-type-tabs" style="display: flex; gap: 4px; width: 100%;">
+                    <button class="tab-btn active" data-type="PrivatePerson" id="tab-private" style="flex: 1;">👤 Фізична особа</button>
+                    <button class="tab-btn" data-type="Organization" id="tab-fop" style="flex: 1;">🏢 Юр. особа / ФОП</button>
+                </div>
             </div>
             
-            <!-- We keep the existing hidden/visible fields for logic compatibility -->
             <div id="recipient-fields-container">
-                <div class="compact-form-group sidebar-group">
-                    <label class="compact-label">ФІО отримувача <span class="required">*</span></label>
-                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 4px;">
-                        <input type="text" class="compact-input" id="recipient-lastname" placeholder="Прізвище">
-                        <input type="text" class="compact-input" id="recipient-firstname" placeholder="Ім'я">
+                <div id="recipient-private-form">
+                    <div class="compact-form-group sidebar-group">
+                        <label class="compact-label">ФІО отримувача <span class="required">*</span></label>
+                        <input type="text" class="compact-input" id="recipient-fullname" placeholder="Н-р: Іванов Іван Іванович">
+                    </div>
+                </div>
+
+                <div id="recipient-fop-form" style="display:none;">
+                    <div class="compact-form-group sidebar-group">
+                        <label class="compact-label">Код ЄДРПОУ <span class="required">*</span></label>
+                        <input type="text" class="compact-input" id="recipient-edrpou" placeholder="12345678">
+                    </div>
+                    <div class="compact-form-group sidebar-group">
+                        <label class="compact-label">Назва організації / ФОП</label>
+                        <input type="text" class="compact-input" id="recipient-fop-name" placeholder="Назва">
+                    </div>
+                    <div class="compact-form-group sidebar-group" style="display: grid; grid-template-columns: 1fr 1fr; gap: 4px;">
+                        <div>
+                            <label class="compact-label">Прізвище конт. особи</label>
+                            <input type="text" class="compact-input" id="recipient-fop-contact-lastname" placeholder="Прізвище">
+                        </div>
+                        <div>
+                            <label class="compact-label">Ім'я конт. особи</label>
+                            <input type="text" class="compact-input" id="recipient-fop-contact-firstname" placeholder="Ім'я">
+                        </div>
                     </div>
                 </div>
                 
@@ -384,14 +416,10 @@ export function renderCreateTTN() {
                     <span class="summary-label">Сума доставки</span>
                     <span class="summary-value" id="sum-delivery-cost">0.00 грн</span>
                 </div>
-                <div class="summary-item">
-                    <span class="summary-label">Сума комісії перепродавця</span>
-                    <span class="summary-value">0.00 USD</span>
-                </div>
                 
                 <div class="compact-form-group" style="margin-top: 10px;">
                     <label class="compact-label">Оголошена цінність, UAH <span class="required">*</span></label>
-                    <input type="number" class="compact-input" id="cargo-cost" value="23088">
+                    <input type="number" class="compact-input" id="cargo-cost" value="0">
                 </div>
                 
                 <div class="compact-form-group" style="margin-top: 10px;">
@@ -420,7 +448,6 @@ export function renderCreateTTN() {
           <input type="number" id="cargo-weight" value="1">
           <input type="number" id="cargo-seats" value="1">
           <textarea id="note"></textarea>
-          <div id="recipient-type-tabs"><button data-type="PrivatePerson" id="tab-private" class="active"></button></div>
           <input type="text" id="recipient-middlename">
           <select id="backward-type"><option value="Money">Money</option></select>
           <select id="backward-payer"><option value="Recipient">Recipient</option></select>

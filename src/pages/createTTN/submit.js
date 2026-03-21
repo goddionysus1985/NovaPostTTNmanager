@@ -92,12 +92,14 @@ export async function submitTTN(navigateTo) {
     let recipientRef = '', recipientContactRef = '';
 
     if (state.recipientType === 'PrivatePerson') {
-        recipientLastName = document.getElementById('recipient-lastname')?.value?.trim();
-        recipientFirstName = document.getElementById('recipient-firstname')?.value?.trim();
-        recipientMiddleName = document.getElementById('recipient-middlename')?.value?.trim() || '';
+        const fullName = document.getElementById('recipient-fullname')?.value?.trim() || '';
+        const parts = fullName.split(/\s+/);
+        recipientLastName = parts[0] || '';
+        recipientFirstName = parts[1] || '';
+        recipientMiddleName = parts.slice(2).join(' ') || '';
         recipientPhone = document.getElementById('recipient-phone')?.value?.trim();
     } else {
-        recipientPhone = document.getElementById('recipient-fop-phone')?.value?.trim();
+        recipientPhone = document.getElementById('recipient-phone')?.value?.trim();
     }
 
     // Validate

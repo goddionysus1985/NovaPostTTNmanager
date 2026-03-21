@@ -76,7 +76,7 @@ export async function loadSenderData() {
         }
 
         senderSection.innerHTML = html`
-      <div class="compact-grid">
+      <div class="compact-grid" style="grid-template-columns: 1fr 1fr; margin-bottom: 10px;">
         <div class="compact-form-group">
           <label class="compact-label">Контрагент</label>
           <select class="compact-select" id="sender-select">
@@ -89,6 +89,8 @@ export async function loadSenderData() {
             ${contacts.map(c => html`<option value="${c.Ref}" ${c.Ref === contact?.Ref ? 'selected' : ''}>${c.Description}</option>`)}
           </select>
         </div>
+      </div>
+      <div class="compact-grid" style="grid-template-columns: 1fr 1fr; margin-bottom: 15px;">
         <div class="compact-form-group">
           <label class="compact-label">Телефон</label>
           <input type="tel" class="compact-input" id="sender-phone" value="${state.senderPhone}" placeholder="380XXXXXXXXX">
@@ -98,8 +100,8 @@ export async function loadSenderData() {
           <!-- autocomplete injected -->
         </div>
       </div>
-      <div class="compact-form-group" id="sender-warehouse-group" style="margin-top: 10px;">
-          <label class="compact-label">Відділення <span class="required">*</span></label>
+      <div class="compact-form-group" id="sender-warehouse-group" style="width: 100%;">
+          <label class="compact-label">Відділення відправника <span class="required">*</span></label>
           <!-- autocomplete injected -->
       </div>
     `;
