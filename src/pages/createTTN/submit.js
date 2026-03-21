@@ -284,6 +284,8 @@ export async function submitTTN(navigateTo) {
             }
         }
 
+        const isSpecialCargo = document.getElementById('special-cargo-toggle-global')?.checked || false;
+
         const ttnParams = {
             PayerType: payerType,
             PaymentMethod: paymentMethod,
@@ -305,6 +307,10 @@ export async function submitTTN(navigateTo) {
             ContactRecipient: recipientContactRef,
             RecipientsPhone: recipientPhone,
         };
+
+        if (isSpecialCargo) {
+            ttnParams.specialCargo = "1";
+        }
 
         if (isDoorRecipient) {
             ttnParams.RecipientHouse = recipientHouse;
@@ -333,6 +339,7 @@ export async function submitTTN(navigateTo) {
                 let hasIndividualWeights = false;
 
                 const defaultWeight = weight ? String((parseFloat(weight) / (parseFloat(seats) || 1)).toFixed(2)) : '1';
+                const defaultCost = cost ? String((parseFloat(cost) / (parseFloat(seats) || 1)).toFixed(2)) : '0';
 
                 rows.forEach(row => {
                     const w = row.querySelector('.cargo-width')?.value;
@@ -341,23 +348,38 @@ export async function submitTTN(navigateTo) {
                     const pWeight = row.querySelector('.cargo-weight-place')?.value;
 
                     const seatObj = {
-                        weight: pWeight || defaultWeight
+                        weight: parseFloat(pWeight || defaultWeight)
                     };
 
                     if (pWeight) hasIndividualWeights = true;
 
                     if (w && l && h) {
                         hasValidDimensions = true;
-                        seatObj.volumetricVolume = String(parseFloat(w) * parseFloat(l) * parseFloat(h) / 4000);
-                        seatObj.volumetricWidth = w;
-                        seatObj.volumetricLength = l;
-                        seatObj.volumetricHeight = h;
+                        // Use numbers for dimensions as per official examples
+                        seatObj.volumetricWidth = parseFloat(w);
+                        seatObj.volumetricLength = parseFloat(l);
+                        seatObj.volumetricHeight = parseFloat(h);
+                        // Calculation for volumetric volume (sometimes needed by other systems)
+                        seatObj.volumetricVolume = String((seatObj.volumetricWidth * seatObj.volumetricLength * seatObj.volumetricHeight / 4000).toFixed(4));
+
+                        if (isSpecialCargo) {
+                            if (seatObj.volumetricLength > 120 || seatObj.volumetricWidth > 70 || seatObj.volumetricHeight > 70 || seatObj.weight > 30) {
+                                console.warn('[TTN] Warning: Manual Handling (РО) limits exceeded for one of the places (L:120, W:70, H:70, Weight:30).');
+                            }
+                        }
+                    }
+
+                    if (isSpecialCargo) {
+                        // When specialCargo (РО) is enabled, these specific fields are mandatory in each seat object
+                        seatObj.specialCargo = "1";
+                        seatObj.cost = defaultCost;
+                        seatObj.description = descValue;
                     }
 
                     optionsSeat.push(seatObj);
                 });
 
-                if (hasValidDimensions || hasIndividualWeights) {
+                if (hasValidDimensions || hasIndividualWeights || isSpecialCargo) {
                     ttnParams.OptionsSeat = optionsSeat;
                 }
             }

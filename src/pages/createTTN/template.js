@@ -43,6 +43,18 @@ export function renderCreateTTN() {
           border-radius: var(--radius-md);
           padding: var(--space-md);
           margin-bottom: var(--space-md);
+          position: relative;
+          overflow: visible;
+        }
+        
+        /* Ensure dropdowns are visible and on top */
+        .compact-card:has(.autocomplete-dropdown.show) {
+          z-index: 100;
+        }
+        
+        .compact-form-group:has(.autocomplete-dropdown.show) {
+          z-index: 101;
+          position: relative;
         }
         
         .compact-card-header {
