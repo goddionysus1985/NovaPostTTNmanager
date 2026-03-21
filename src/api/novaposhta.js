@@ -225,6 +225,7 @@ export async function getCounterpartyByEDRPOU(edrpou) {
  */
 export async function createTTN(params) {
     const data = await apiCall('InternetDocument', 'save', params);
+    if (data.success) cacheClear(); // clear cache so new TTN shows up
     return data.data?.[0] || null;
 }
 
@@ -235,7 +236,9 @@ export async function getDocumentList(dateFrom = '', dateTo = '', page = 1) {
     const props = { Page: String(page), GetFullList: '0' };
     if (dateFrom) props.DateTimeFrom = dateFrom;
     if (dateTo) props.DateTimeTo = dateTo;
-    const data = await apiCall('InternetDocument', 'getDocumentList', props);
+    
+    // Cache for 30s to prevent 'Too Many Requests' during rapid navigation
+    const data = await cachedApiCall('InternetDocument', 'getDocumentList', props, 30000);
     return { documents: data.data || [], info: data.info || {} };
 }
 
@@ -246,6 +249,7 @@ export async function deleteTTN(docRef) {
     const data = await apiCall('InternetDocument', 'delete', {
         DocumentRefs: docRef,
     });
+    if (data.success) cacheClear(); // clear cache so deleted TTN is removed from list
     return data.data || [];
 }
 
