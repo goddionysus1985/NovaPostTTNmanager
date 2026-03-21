@@ -27,7 +27,7 @@ export const state = {
     // Cargo
     weight: '1',
     seatsAmount: '1',
-    cost: '0',
+    cost: '',
     description: '',
 
     // Dimensions

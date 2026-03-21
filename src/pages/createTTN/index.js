@@ -87,10 +87,7 @@ function updateSummary() {
     setEl('sum-seats', seats);
     setEl('sum-cost', `${cost} грн`);
     
-    // Updates for sidebar sums
-    setEl('sum-parts', '520 USD'); // Mock value from UI
-    setEl('sum-advance', `${cost} грн`);
-    setEl('sum-delivery-cost', '—'); 
+    // No sidebar sums anymore
 }
 
 function updateDimensionsContainer() {

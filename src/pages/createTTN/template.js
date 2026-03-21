@@ -404,28 +404,15 @@ export function renderCreateTTN() {
             <div class="compact-card-header">Суми</div>
             
             <div class="summary-list">
-                <div class="summary-item">
-                    <span class="summary-label">Сума ЗЧ</span>
-                    <span class="summary-value" id="sum-parts">520 USD</span>
-                </div>
-                <div class="summary-item">
-                    <span class="summary-label">Сума аванса</span>
-                    <span class="summary-value" id="sum-advance">23088.00 грн</span>
-                </div>
-                <div class="summary-item">
-                    <span class="summary-label">Сума доставки</span>
-                    <span class="summary-value" id="sum-delivery-cost">0.00 грн</span>
-                </div>
-                
                 <div class="compact-form-group" style="margin-top: 10px;">
                     <label class="compact-label">Оголошена цінність, UAH <span class="required">*</span></label>
-                    <input type="number" class="compact-input" id="cargo-cost" value="0">
+                    <input type="number" class="compact-input" id="cargo-cost" value="" placeholder="0">
                 </div>
                 
                 <div class="compact-form-group" style="margin-top: 10px;">
                     <label class="compact-label">Наложений платіж, UAH / факт. <span class="required">*</span></label>
                     <div style="display: flex; align-items: center; gap: 8px;">
-                        <input type="number" class="compact-input" id="backward-value" value="0.00">
+                        <input type="number" class="compact-input" id="backward-value" value="0,00">
                         <span style="font-size: 12px; font-weight: 600;">UAH</span>
                     </div>
                     <!-- hidden state for backward delivery -->
