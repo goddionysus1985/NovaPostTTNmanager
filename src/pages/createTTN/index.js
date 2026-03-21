@@ -182,8 +182,16 @@ function addPlace() {
 export function initCreateTTN(navigateTo) {
     if (!hasApiKey()) return;
 
-    // Initialize sender data
-    loadSenderData();
+    // ── RESET transient state on each page visit ──
+    // Prevents places count from accumulating between navigations
+    state.places = [{ width: '', length: '', height: '', weight: '', specialCargo: false }];
+
+    // Initialize sender data — applyDefaults runs AFTER sender loads
+    loadSenderData().then(() => {
+        applyDefaults();
+    }).catch(() => {
+        applyDefaults(); // still try defaults even if sender load fails
+    });
 
     // Initialize autocompletes
     initRecipientCityAutocomplete();
@@ -300,7 +308,5 @@ export function initCreateTTN(navigateTo) {
             }
         });
     }
-
-    // Default values delay to ensure ACs are ready
-    setTimeout(applyDefaults, 100);
 }
+

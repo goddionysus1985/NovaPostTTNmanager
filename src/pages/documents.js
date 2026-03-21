@@ -6,6 +6,7 @@
 import { getDocumentList, deleteTTN, getPrintUrl, getPrintUrlBatch, getPrintMarkingUrl, hasApiKey } from '../api/novaposhta.js';
 import { showToast } from '../components/toast.js';
 import { html } from '../utils/dom.js';
+import { getStatusClass } from '../utils/status.js';
 
 /** @type {number} */
 let currentPage = 1;
@@ -180,7 +181,7 @@ function renderTable(tableEl) {
 }
 
 function renderRow(d) {
-  const statusClass = getDocStatusClass(d.StateName);
+  const statusClass = getStatusClass(d.StateName);
   return html`
     <tr data-ref="${d.Ref}">
       <td><input type="checkbox" class="doc-checkbox" value="${d.Ref}" data-number="${d.IntDocNumber}"></td>
@@ -357,15 +358,6 @@ function printSelected() {
   window.open(url, '_blank');
 }
 
-function getDocStatusClass(stateName) {
-  if (!stateName) return '';
-  if (stateName.includes('Отримана') || stateName.includes('Виконано')) return 'delivered';
-  if (stateName.includes('дорозі') || stateName.includes('Прямує')) return 'in-transit';
-  if (stateName.includes('Прибув')) return 'in-transit';
-  if (stateName.includes('Нова') || stateName.includes('Створена')) return 'new';
-  if (stateName.includes('Проблем') || stateName.includes('Відмова')) return 'problem';
-  return 'new';
-}
 
 function formatDate(d) {
   const dd = String(d.getDate()).padStart(2, '0');

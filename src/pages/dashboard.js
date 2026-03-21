@@ -5,6 +5,7 @@
 import { getDocumentList, trackDocument, hasApiKey } from '../api/novaposhta.js';
 import { showToast } from '../components/toast.js';
 import { html } from '../utils/dom.js';
+import { getStatusClass } from '../utils/status.js';
 
 export async function renderDashboard() {
   if (!hasApiKey()) {
@@ -168,12 +169,3 @@ export async function initDashboard() {
 }
 
 
-function getStatusClass(stateName) {
-  if (!stateName) return '';
-  if (stateName.includes('Отримана') || stateName.includes('Виконано')) return 'delivered';
-  if (stateName.includes('дорозі') || stateName.includes('Прямує')) return 'in-transit';
-  if (stateName.includes('Прибув')) return 'in-transit';
-  if (stateName.includes('Створена') || stateName.includes('Нова')) return 'new';
-  if (stateName.includes('Проблем') || stateName.includes('Відмова')) return 'problem';
-  return 'new';
-}

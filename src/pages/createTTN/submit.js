@@ -355,10 +355,10 @@ export async function submitTTN(navigateTo) {
     const recipientPhone = normalizePhone(
         document.getElementById('recipient-phone')?.value?.trim() || ''
     );
+    // NOTE: getValue() returns the internal Ref (UUID), NOT the display text.
+    // We always want the visible text label from the input for the Description field.
     const cargoDescAC = autocompletes.cargoDesc;
-    const descValue = cargoDescAC?.getValue()
-        ? (cargoDescAC.input?.value?.trim() || '')
-        : (cargoDescAC?.input?.value?.trim() || '');
+    const descValue = cargoDescAC?.input?.value?.trim() || '';
 
     // ── 2. Validate ──
     const validationError = validateForm(serviceType, recipientPhone, descValue);

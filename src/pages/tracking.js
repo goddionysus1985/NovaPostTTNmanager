@@ -5,6 +5,7 @@
 import { trackDocument, hasApiKey } from '../api/novaposhta.js';
 import { showToast } from '../components/toast.js';
 import { html } from '../utils/dom.js';
+import { getStatusClassByCode } from '../utils/status.js';
 
 export function renderTracking() {
   return html`
@@ -70,11 +71,20 @@ export function initTracking() {
 }
 
 async function doTrack(ttn) {
+  // Validate TTN format: must be 14 digits
   if (!ttn) {
     showToast('warning', 'Увага', 'Введіть номер ТТН');
     return;
   }
 
+  const cleanTTN = ttn.replace(/\s/g, '');
+  if (!/^\d{14}$/.test(cleanTTN)) {
+    showToast('warning', 'Невірний формат', 'Номер ТТН повинен містити рівно 14 цифр (напр.: 20451234567890)');
+    return;
+  }
+
+  const input = document.getElementById('tracking-input');
+  if (input) input.value = cleanTTN; // normalize display
   const resultEl = document.getElementById('tracking-result');
   const btn = document.getElementById('track-btn');
 
@@ -104,7 +114,7 @@ async function doTrack(ttn) {
         </div>
       `;
     } else {
-      const statusClass = getStatusClass(data.StatusCode);
+  const statusClass = getStatusClassByCode(data.StatusCode);
 
       resultEl.innerHTML = html`
         <div class="card" style="margin-top: var(--space-xl);">
@@ -199,15 +209,6 @@ async function doTrack(ttn) {
 
   btn.disabled = false;
   btn.innerHTML = '🔍 Відстежити';
-}
-
-function getStatusClass(code) {
-  const c = parseInt(code);
-  if (c === 9 || c === 10 || c === 11) return 'delivered';
-  if (c >= 4 && c <= 8) return 'in-transit';
-  if (c >= 1 && c <= 3) return 'new';
-  if (c >= 100) return 'problem';
-  return 'new';
 }
 
 function saveToHistory(ttn, status) {
