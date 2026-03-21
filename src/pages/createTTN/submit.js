@@ -21,6 +21,7 @@ import {
 } from '../../api/novaposhta.js';
 import { showToast } from '../../components/toast.js';
 import { html } from '../../utils/dom.js';
+import { fireConfetti } from '../../utils/confetti.js';
 import { state, autocompletes } from './state.js';
 
 // ─── Phone Normalization ──────────────────────────────────────────────────────
@@ -509,6 +510,9 @@ export function showResultModal(docNumber, docRef, printUrl, markingUrl, cost, e
   `;
 
     document.body.appendChild(overlay);
+    
+    // Fire confetti! 🎉
+    setTimeout(fireConfetti, 50);
 
     overlay.querySelector('#close-result-modal').addEventListener('click', () => overlay.remove());
     overlay.querySelector('#copy-ttn-number').addEventListener('click', () => {
