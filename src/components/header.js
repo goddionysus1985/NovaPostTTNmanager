@@ -16,15 +16,21 @@ export function renderHeader(activePage) {
           <div class="logo-icon">NP</div>
           <span>TTN Manager</span>
         </a>
-        <nav class="nav">
-          ${pages.map(p => html`
-            <button class="nav-btn ${activePage === p.id ? 'active' : ''}" data-nav="${p.id}" id="nav-${p.id}">
-              <span>${p.icon}</span>
-              <span class="nav-text">${p.label}</span>
-            </button>
-          `)}
-        </nav>
+        <div style="display: flex; align-items: center; gap: var(--space-md);">
+          <nav class="nav">
+            ${pages.map(p => html`
+              <button class="nav-btn ${activePage === p.id ? 'active' : ''}" data-nav="${p.id}" id="nav-${p.id}">
+                <span>${p.icon}</span>
+                <span class="nav-text">${p.label}</span>
+              </button>
+            `)}
+          </nav>
+          <button class="theme-toggle" id="theme-toggle" title="Змінити тему" aria-label="Змінити тему">
+            ${document.documentElement.getAttribute('data-theme') === 'light' ? '🌙' : '☀️'}
+          </button>
+        </div>
       </div>
     </header>
+
   `;
 }

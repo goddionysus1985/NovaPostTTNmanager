@@ -26,6 +26,21 @@ async function navigateTo(page) {
   await renderPage();
 }
 
+// Theme handling
+function initTheme() {
+  const savedTheme = localStorage.getItem('theme') || 'dark';
+  document.documentElement.setAttribute('data-theme', savedTheme);
+}
+
+function toggleTheme() {
+  const currentTheme = document.documentElement.getAttribute('data-theme');
+  const newTheme = currentTheme === 'light' ? 'dark' : 'light';
+  document.documentElement.setAttribute('data-theme', newTheme);
+  localStorage.setItem('theme', newTheme);
+  renderPage();
+}
+
+
 async function renderPage() {
   let pageContent = '';
 
@@ -54,6 +69,13 @@ async function renderPage() {
 
   // Bind navigation
   bindNavigation();
+
+  // Bind theme toggle
+  const themeToggle = document.getElementById('theme-toggle');
+  if (themeToggle) {
+    themeToggle.addEventListener('click', toggleTheme);
+  }
+
 
   // Initialize page-specific logic
   switch (currentPage) {
@@ -104,4 +126,6 @@ function handleHash() {
 window.addEventListener('hashchange', handleHash);
 
 // Initial render
+initTheme();
 handleHash();
+
