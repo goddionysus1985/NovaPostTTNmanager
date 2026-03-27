@@ -205,7 +205,7 @@
         }
         
         .compact-input, .compact-select {
-          background: rgba(15, 23, 42, 0.6);
+          background: var(--bg-input);
           border: 1px solid var(--border-color);
           border-radius: 4px;
           padding: 6px 10px;
@@ -267,7 +267,8 @@
           left: 0;
           right: 0;
           bottom: 0;
-          background-color: #334155;
+          background-color: var(--bg-glass);
+          border: 1px solid var(--border-color);
           transition: .4s;
           border-radius: 20px;
         }
@@ -275,17 +276,19 @@
         .slider:before {
           position: absolute;
           content: "";
-          height: 14px;
-          width: 14px;
+          height: 12px;
+          width: 12px;
           left: 3px;
           bottom: 3px;
           background-color: white;
           transition: .4s;
           border-radius: 50%;
+          box-shadow: var(--shadow-sm);
         }
         
         input:checked + .slider {
           background-color: var(--accent);
+          border-color: var(--accent);
         }
         
         input:checked + .slider:before {
@@ -333,7 +336,7 @@
         
         /* Tabs Styling */
         .tab-btn {
-          background: rgba(51, 65, 85, 0.4);
+          background: var(--bg-glass);
           border: 1px solid var(--border-color);
           color: var(--text-muted);
           cursor: pointer;
@@ -345,7 +348,7 @@
         }
         
         .tab-btn:hover {
-          background: rgba(51, 65, 85, 0.6);
+          background: var(--bg-card-hover);
           color: var(--text-primary);
         }
         
