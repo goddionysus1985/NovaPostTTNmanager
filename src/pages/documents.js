@@ -6,6 +6,7 @@
 import { getDocumentList, deleteTTN, getPrintUrl, getPrintUrlBatch, getPrintMarkingUrl, hasApiKey } from '../api/novaposhta.js';
 import { showToast } from '../components/toast.js';
 import { html } from '../utils/dom.js';
+import { t } from '../utils/i18n.js';
 import { getStatusClass } from '../utils/status.js';
 
 /** @type {number} */
@@ -23,8 +24,8 @@ export function renderDocuments() {
       <div class="main-content page-enter">
         <div class="empty-state">
           <div class="empty-icon">🔑</div>
-          <div class="empty-title">Встановіть API ключ</div>
-          <p>Перейдіть до <a href="#" data-nav="settings">Налаштувань</a></p>
+          <div class="empty-title">${t('create.set_api_key')}</div>
+          <p>${t('create.go_to_settings')} <a href="#" data-nav="settings">${t('nav.settings')}</a></p>
         </div>
       </div>
     `;
@@ -33,25 +34,25 @@ export function renderDocuments() {
   return html`
     <div class="main-content page-enter">
       <div class="page-header">
-        <h1 class="page-title">Мої ТТН</h1>
-        <p class="page-subtitle">Список створених товарно-транспортних накладних</p>
+        <h1 class="page-title">${t('docs.title')}</h1>
+        <p class="page-subtitle">${t('docs.subtitle')}</p>
       </div>
 
       <div class="card" style="margin-bottom: var(--space-lg);">
         <div class="form-grid" style="align-items: end;">
           <div class="form-group">
-            <label class="form-label">Дата від</label>
+            <label class="form-label">${t('docs.date_from')}</label>
             <input type="text" class="form-input" id="docs-date-from" placeholder="ДД.ММ.РРРР">
           </div>
           <div class="form-group">
-            <label class="form-label">Дата до</label>
+            <label class="form-label">${t('docs.date_to')}</label>
             <input type="text" class="form-input" id="docs-date-to" placeholder="ДД.ММ.РРРР">
           </div>
           <div class="form-group">
-            <button class="btn btn-primary" id="docs-filter-btn">🔍 Фільтрувати</button>
+            <button class="btn btn-primary" id="docs-filter-btn">${t('docs.filter')}</button>
           </div>
           <div class="form-group">
-            <button class="btn btn-secondary" id="docs-print-selected-btn" disabled>🖨️ Друк обраних</button>
+            <button class="btn btn-secondary" id="docs-print-selected-btn" disabled>${t('docs.print_selected')}</button>
           </div>
         </div>
       </div>
@@ -60,7 +61,7 @@ export function renderDocuments() {
         <div id="documents-table">
           <div style="text-align: center; padding: var(--space-xl);">
             <div class="spinner spinner-lg" style="margin: 0 auto;"></div>
-            <p style="margin-top: var(--space-sm); color: var(--text-muted);">Завантаження документів...</p>
+            <p style="margin-top: var(--space-sm); color: var(--text-muted);">${t('docs.loading')}</p>
           </div>
         </div>
       </div>
@@ -110,7 +111,7 @@ async function loadDocuments(page) {
   tableEl.innerHTML = html`
     <div style="text-align: center; padding: var(--space-xl);">
       <div class="spinner spinner-lg" style="margin: 0 auto;"></div>
-      <p style="margin-top: var(--space-sm); color: var(--text-muted);">Завантаження...</p>
+      <p style="margin-top: var(--space-sm); color: var(--text-muted);">${t('docs.loading2')}</p>
     </div>
   `;
   renderPagination(null); // clear pagination while loading
@@ -128,8 +129,8 @@ async function loadDocuments(page) {
       tableEl.innerHTML = html`
         <div class="empty-state">
           <div class="empty-icon">📭</div>
-          <div class="empty-title">Немає документів</div>
-          <p>За обраний період ТТН не знайдено</p>
+          <div class="empty-title">${t('docs.no_docs')}</div>
+          <p>${t('docs.no_docs_msg')}</p>
         </div>
       `;
       renderPagination(null);
@@ -141,11 +142,11 @@ async function loadDocuments(page) {
     renderPagination(currentInfo);
 
   } catch (err) {
-    showToast('error', 'Помилка', err.message);
+    showToast('error', t('docs.error'), err.message);
     tableEl.innerHTML = html`
       <div class="empty-state">
         <div class="empty-icon">❌</div>
-        <div class="empty-title">Помилка завантаження</div>
+        <div class="empty-title">${t('docs.error')}</div>
         <p>${err.message}</p>
       </div>
     `;
@@ -162,14 +163,14 @@ function renderTable(tableEl) {
         <thead>
           <tr>
             <th><input type="checkbox" id="select-all-docs" title="Вибрати всі"></th>
-            <th>№ ТТН</th>
-            <th>Дата</th>
-            <th>Отримувач</th>
-            <th>Місто</th>
-            <th>Вага</th>
-            <th>Вартість</th>
-            <th>Статус</th>
-            <th>Дії</th>
+            <th>${t('docs.col_ttn')}</th>
+            <th>${t('docs.col_date')}</th>
+            <th>${t('docs.col_recipient')}</th>
+            <th>${t('docs.col_city')}</th>
+            <th>${t('docs.col_weight')}</th>
+            <th>${t('docs.col_cost')}</th>
+            <th>${t('docs.col_status')}</th>
+            <th>${t('docs.col_actions')}</th>
           </tr>
         </thead>
         <tbody>
@@ -226,15 +227,15 @@ function bindTableEvents(tableEl) {
   tableEl.querySelectorAll('.delete-doc-btn').forEach(btn => {
     btn.addEventListener('click', async () => {
       const { ref, number } = btn.dataset;
-      if (!confirm(`Видалити ТТН ${number}?`)) return;
+      if (!confirm(`${t('docs.confirm_delete')} ${number}?`)) return;
 
       btn.disabled = true;
       try {
         await deleteTTN(ref);
-        showToast('success', 'Видалено', `ТТН ${number} видалена`);
+        showToast('success', t('docs.deleted'), `ТТН ${number} видалена`);
         await loadDocuments(currentPage);
       } catch (err) {
-        showToast('error', 'Помилка видалення', err.message);
+        showToast('error', t('docs.delete_error'), err.message);
         btn.disabled = false;
       }
     });
@@ -264,7 +265,7 @@ function renderPagination(info) {
 
   if (totalPages <= 1) {
     paginationEl.innerHTML = total > 0
-      ? html`<span style="color: var(--text-muted); font-size: var(--font-size-sm);">Всього: ${total} документів</span>`
+      ? html`<span style="color: var(--text-muted); font-size: var(--font-size-sm);">${t('docs.total')}: ${total}</span>`
       : '';
     return;
   }
@@ -273,13 +274,13 @@ function renderPagination(info) {
 
   paginationEl.innerHTML = html`
     <span style="color: var(--text-muted); font-size: var(--font-size-sm); margin-right: var(--space-sm);">
-      Всього: ${total}
+      ${t('docs.total')}: ${total}
     </span>
     <button
       class="btn btn-ghost btn-sm"
       id="page-prev"
       ${currentPage <= 1 ? 'disabled' : ''}
-    >← Попередня</button>
+    >${t('docs.prev')}</button>
 
     ${pages.map(p =>
       p === '...'
@@ -294,7 +295,7 @@ function renderPagination(info) {
       class="btn btn-ghost btn-sm"
       id="page-next"
       ${currentPage >= totalPages ? 'disabled' : ''}
-    >Наступна →</button>
+    >${t('docs.next')}</button>
   `;
 
   // Bind buttons
@@ -345,13 +346,13 @@ function printSelected() {
   const numbers = Array.from(checked).map(cb => cb.dataset.number).filter(Boolean);
 
   if (numbers.length === 0) {
-    showToast('warning', 'Увага', 'Оберіть ТТН для друку');
+    showToast('warning', t('docs.warn_print'), '');
     return;
   }
 
   // Warn about URL-length limits (rough threshold: ~30 numbers)
   if (numbers.length > 30) {
-    showToast('warning', 'Увага', 'Обрано забагато ТТН. Рекомендується не більше 30 за раз.');
+    showToast('warning', t('docs.warn_too_many'), '');
   }
 
   const url = getPrintUrlBatch(numbers, 'pdf');

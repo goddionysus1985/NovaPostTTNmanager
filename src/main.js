@@ -13,6 +13,7 @@ import { renderDocuments, initDocuments } from './pages/documents.js';
 import { renderSettings, initSettings } from './pages/settings.js';
 import { hasApiKey } from './api/novaposhta.js';
 import { html } from './utils/dom.js';
+import { setLanguage, getLanguage } from './utils/i18n.js';
 
 const app = document.getElementById('app');
 
@@ -40,6 +41,12 @@ function toggleTheme() {
   renderPage();
 }
 
+function toggleLanguage() {
+  const currentLang = getLanguage();
+  const newLang = currentLang === 'ua' ? 'ru' : 'ua';
+  setLanguage(newLang);
+  renderPage();
+}
 
 async function renderPage() {
   let pageContent = '';
@@ -74,6 +81,12 @@ async function renderPage() {
   const themeToggle = document.getElementById('theme-toggle');
   if (themeToggle) {
     themeToggle.addEventListener('click', toggleTheme);
+  }
+
+  // Bind language toggle
+  const langToggle = document.getElementById('lang-toggle');
+  if (langToggle) {
+    langToggle.addEventListener('click', toggleLanguage);
   }
 
 

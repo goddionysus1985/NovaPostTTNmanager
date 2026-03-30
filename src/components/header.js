@@ -1,12 +1,14 @@
 import { html } from '../utils/dom.js';
+import { t, getLanguage } from '../utils/i18n.js';
 
 export function renderHeader(activePage) {
+  const currentLang = getLanguage();
   const pages = [
-    { id: 'dashboard', icon: '📊', label: 'Панель' },
-    { id: 'create', icon: '📝', label: 'Створити ТТН' },
-    { id: 'tracking', icon: '🔍', label: 'Трекінг' },
-    { id: 'documents', icon: '📄', label: 'Мої ТТН' },
-    { id: 'settings', icon: '⚙️', label: 'Налаштування' },
+    { id: 'dashboard', icon: '📊', label: t('nav.dashboard') },
+    { id: 'create', icon: '📝', label: t('nav.create') },
+    { id: 'tracking', icon: '🔍', label: t('nav.tracking') },
+    { id: 'documents', icon: '📄', label: t('nav.documents') },
+    { id: 'settings', icon: '⚙️', label: t('nav.settings') },
   ];
 
   return html`
@@ -25,12 +27,18 @@ export function renderHeader(activePage) {
               </button>
             `)}
           </nav>
-          <button class="theme-toggle" id="theme-toggle" title="Змінити тему" aria-label="Змінити тему">
-            ${document.documentElement.getAttribute('data-theme') === 'light' ? '🌙' : '☀️'}
-          </button>
+          
+          <div class="header-actions">
+            <button class="lang-toggle" id="lang-toggle" title="Змінити мову" aria-label="Змінити мову">
+              ${currentLang.toUpperCase()}
+            </button>
+            <button class="theme-toggle" id="theme-toggle" title="${t('theme.toggle')}" aria-label="${t('theme.toggle')}">
+              ${document.documentElement.getAttribute('data-theme') === 'light' ? '🌙' : '☀️'}
+            </button>
+          </div>
         </div>
       </div>
     </header>
-
   `;
 }
+

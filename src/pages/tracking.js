@@ -5,25 +5,26 @@
 import { trackDocument, hasApiKey } from '../api/novaposhta.js';
 import { showToast } from '../components/toast.js';
 import { html } from '../utils/dom.js';
+import { t } from '../utils/i18n.js';
 import { getStatusClassByCode } from '../utils/status.js';
 
 export function renderTracking() {
   return html`
     <div class="main-content page-enter">
       <div class="page-header">
-        <h1 class="page-title">Трекінг посилки</h1>
-        <p class="page-subtitle">Відстежуйте статус вашої посилки за номером ТТН</p>
+        <h1 class="page-title">${t('track.title')}</h1>
+        <p class="page-subtitle">${t('track.subtitle')}</p>
       </div>
 
       <div class="card">
         <div class="card-header">
-          <div class="card-title"><span class="icon">🔍</span> Пошук за номером ТТН</div>
+          <div class="card-title"><span class="icon">🔍</span> ${t('track.search_title')}</div>
         </div>
         <div class="tracking-input-group">
-          <input type="text" class="form-input" id="tracking-input" placeholder="Введіть номер ТТН (напр. 20450000000000)" autocomplete="off">
-          <button class="btn btn-primary btn-lg" id="track-btn">🔍 Відстежити</button>
+          <input type="text" class="form-input" id="tracking-input" placeholder="${t('track.placeholder')}" autocomplete="off">
+          <button class="btn btn-primary btn-lg" id="track-btn">${t('track.btn')}</button>
         </div>
-        <div class="form-hint" style="margin-top: var(--space-sm);">Введіть 14-значний номер товарно-транспортної накладної</div>
+        <div class="form-hint" style="margin-top: var(--space-sm);">${t('track.hint')}</div>
       </div>
 
       <div id="tracking-result"></div>
@@ -31,12 +32,12 @@ export function renderTracking() {
       <!-- Recent tracked -->
       <div class="card" style="margin-top: var(--space-xl);">
         <div class="card-header">
-          <div class="card-title"><span class="icon">🕐</span> Історія пошуку</div>
-          <button class="btn btn-ghost btn-sm" id="clear-history-btn">Очистити</button>
+          <div class="card-title"><span class="icon">🕐</span> ${t('track.history_title')}</div>
+          <button class="btn btn-ghost btn-sm" id="clear-history-btn">${t('track.clear')}</button>
         </div>
         <div id="tracking-history">
           <div class="empty-state">
-            <p style="color: var(--text-muted);">Історія пошуку порожня</p>
+            <p style="color: var(--text-muted);">${t('track.history_empty')}</p>
           </div>
         </div>
       </div>
@@ -73,13 +74,13 @@ export function initTracking() {
 async function doTrack(ttn) {
   // Validate TTN format: must be 14 digits
   if (!ttn) {
-    showToast('warning', 'Увага', 'Введіть номер ТТН');
+    showToast('warning', t('track.warn_enter'), '');
     return;
   }
 
   const cleanTTN = ttn.replace(/\s/g, '');
   if (!/^\d{14}$/.test(cleanTTN)) {
-    showToast('warning', 'Невірний формат', 'Номер ТТН повинен містити рівно 14 цифр (напр.: 20451234567890)');
+    showToast('warning', t('track.warn_format'), t('track.warn_format_msg'));
     return;
   }
 
@@ -95,7 +96,7 @@ async function doTrack(ttn) {
     <div class="card" style="margin-top: var(--space-xl);">
       <div style="text-align: center; padding: var(--space-lg);">
         <div class="spinner spinner-lg" style="margin: 0 auto;"></div>
-        <p style="margin-top: var(--space-sm); color: var(--text-muted);">Пошук...</p>
+        <p style="margin-top: var(--space-sm); color: var(--text-muted);">${t('track.searching')}</p>
       </div>
     </div>
   `;
@@ -108,8 +109,8 @@ async function doTrack(ttn) {
         <div class="card" style="margin-top: var(--space-xl);">
           <div class="empty-state">
             <div class="empty-icon">🔍</div>
-            <div class="empty-title">Нічого не знайдено</div>
-            <p>Перевірте правильність номера ТТН</p>
+            <div class="empty-title">${t('track.not_found')}</div>
+            <p>${t('track.check_number')}</p>
           </div>
         </div>
       `;
@@ -128,56 +129,56 @@ async function doTrack(ttn) {
 
           <div class="form-grid">
             <div class="form-group">
-              <div class="form-label">Статус</div>
+              <div class="form-label">${t('track.status')}</div>
               <div style="font-weight: 500; color: var(--text-primary);">${data.Status || '—'}</div>
             </div>
             <div class="form-group">
-              <div class="form-label">Дата створення</div>
+              <div class="form-label">${t('track.date_created')}</div>
               <div style="color: var(--text-primary);">${data.DateCreated || '—'}</div>
             </div>
             <div class="form-group">
-              <div class="form-label">Відправник</div>
+              <div class="form-label">${t('track.sender')}</div>
               <div style="color: var(--text-primary);">${data.CitySender || ''} ${data.WarehouseSender || ''}</div>
             </div>
             <div class="form-group">
-              <div class="form-label">Отримувач</div>
+              <div class="form-label">${t('track.recipient')}</div>
               <div style="color: var(--text-primary);">${data.CityRecipient || ''} ${data.WarehouseRecipient || ''}</div>
             </div>
             <div class="form-group">
-              <div class="form-label">Вага</div>
+              <div class="form-label">${t('track.weight')}</div>
               <div style="color: var(--text-primary);">${data.DocumentWeight || '—'} кг</div>
             </div>
             <div class="form-group">
-              <div class="form-label">Вартість доставки</div>
+              <div class="form-label">${t('track.delivery_cost')}</div>
               <div style="color: var(--text-primary);">${data.DocumentCost || '—'} грн</div>
             </div>
             ${data.AnnouncedPrice ? html`
               <div class="form-group">
-                <div class="form-label">Оціночна вартість</div>
+                <div class="form-label">${t('track.declared_price')}</div>
                 <div style="color: var(--text-primary);">${data.AnnouncedPrice} грн</div>
               </div>
             ` : ''}
             ${data.RedeliverySum ? html`
               <div class="form-group">
-                <div class="form-label">Наложений платіж</div>
+                <div class="form-label">${t('track.cod')}</div>
                 <div style="color: var(--accent-light); font-weight: 600;">${data.RedeliverySum} грн</div>
               </div>
             ` : ''}
             ${data.ScheduledDeliveryDate ? html`
               <div class="form-group">
-                <div class="form-label">Дата доставки (план)</div>
+                <div class="form-label">${t('track.scheduled_date')}</div>
                 <div style="color: var(--text-primary);">${data.ScheduledDeliveryDate}</div>
               </div>
             ` : ''}
             ${data.RecipientDateTime ? html`
               <div class="form-group">
-                <div class="form-label">Дата отримання</div>
+                <div class="form-label">${t('track.received_date')}</div>
                 <div style="color: var(--success); font-weight: 500;">${data.RecipientDateTime}</div>
               </div>
             ` : ''}
             ${data.ActualDeliveryDate ? html`
               <div class="form-group">
-                <div class="form-label">Фактична доставка</div>
+                <div class="form-label">${t('track.actual_date')}</div>
                 <div style="color: var(--text-primary);">${data.ActualDeliveryDate}</div>
               </div>
             ` : ''}
@@ -185,7 +186,7 @@ async function doTrack(ttn) {
 
           ${data.TrackingUpdateDate ? html`
             <div style="margin-top: var(--space-md); padding-top: var(--space-sm); border-top: 1px solid var(--border-color); color: var(--text-muted); font-size: var(--font-size-xs);">
-              Останнє оновлення: ${data.TrackingUpdateDate}
+              ${t('track.last_update')}: ${data.TrackingUpdateDate}
             </div>
           ` : ''}
         </div>
@@ -195,12 +196,12 @@ async function doTrack(ttn) {
       saveToHistory(ttn, data.Status);
     }
   } catch (err) {
-    showToast('error', 'Помилка', err.message);
+    showToast('error', t('track.error'), err.message);
     resultEl.innerHTML = html`
       <div class="card" style="margin-top: var(--space-xl);">
         <div class="empty-state">
           <div class="empty-icon">❌</div>
-          <div class="empty-title">Помилка</div>
+          <div class="empty-title">${t('track.error')}</div>
           <p>${err.message}</p>
         </div>
       </div>
@@ -208,7 +209,7 @@ async function doTrack(ttn) {
   }
 
   btn.disabled = false;
-  btn.innerHTML = '🔍 Відстежити';
+  btn.innerHTML = '🔍 ' + t('track.btn');
 }
 
 function saveToHistory(ttn, status) {
@@ -246,7 +247,7 @@ function renderTrackingHistory() {
   if (history.length === 0) {
     container.innerHTML = html`
       <div class="empty-state">
-        <p style="color: var(--text-muted);">Історія пошуку порожня</p>
+        <p style="color: var(--text-muted);">${t('track.history_empty')}</p>
       </div>
     `;
     return;
@@ -257,9 +258,9 @@ function renderTrackingHistory() {
       <table class="table">
         <thead>
           <tr>
-            <th>№ ТТН</th>
-            <th>Статус</th>
-            <th>Дата пошуку</th>
+            <th>${t('track.col_ttn')}</th>
+            <th>${t('track.col_status')}</th>
+            <th>${t('track.col_date')}</th>
             <th></th>
           </tr>
         </thead>

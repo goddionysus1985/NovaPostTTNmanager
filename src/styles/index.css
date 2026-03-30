@@ -312,6 +312,35 @@ a:hover {
     border-color: var(--text-muted);
 }
 
+.header-actions {
+    display: flex;
+    align-items: center;
+    gap: var(--space-sm);
+}
+
+.lang-toggle {
+    background: var(--bg-glass);
+    border: 1px solid var(--border-color);
+    color: var(--text-secondary);
+    min-width: 38px;
+    height: 38px;
+    border-radius: var(--radius-sm);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: var(--transition-fast);
+    font-size: 0.75rem;
+    font-weight: 700;
+    padding: 0 8px;
+}
+
+.lang-toggle:hover {
+    color: var(--text-primary);
+    background: var(--bg-card-hover);
+    border-color: var(--text-muted);
+}
+
 
 /* ========================================
    Main Content

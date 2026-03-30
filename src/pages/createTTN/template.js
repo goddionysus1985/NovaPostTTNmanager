@@ -1,6 +1,7 @@
-import { hasApiKey } from '../../api/novaposhta.js';
+﻿import { hasApiKey } from '../../api/novaposhta.js';
 import { state } from './state.js';
 import { html } from '../../utils/dom.js';
+import { t } from '../../utils/i18n.js';
 
 export function renderCreateTTN() {
   if (!hasApiKey()) {
@@ -8,8 +9,8 @@ export function renderCreateTTN() {
       <div class="main-content page-enter">
         <div class="empty-state">
           <div class="empty-icon">🔑</div>
-          <div class="empty-title">Встановіть API ключ</div>
-          <p>Перейдіть до <a href="#" data-nav="settings">Налаштувань</a></p>
+          <div class="empty-title">${t('create.set_api_key')}</div>
+          <p>${t('create.go_to_settings')} <a href="#" data-nav="settings">${t('nav.settings')}</a></p>
         </div>
       </div>
     `;
@@ -30,13 +31,9 @@ export function renderCreateTTN() {
           gap: var(--space-md);
           align-items: start;
         }
-        
         @media (max-width: 1200px) {
-          .create-ttn-grid {
-            grid-template-columns: 1fr;
-          }
+          .create-ttn-grid { grid-template-columns: 1fr; }
         }
-        
         .compact-card {
           background: var(--bg-card);
           border: 1px solid var(--border-color);
@@ -46,22 +43,9 @@ export function renderCreateTTN() {
           position: relative;
           overflow: visible;
         }
-        
-        /* Ensure dropdowns are visible and on top */
-        .compact-card:has(.autocomplete-dropdown.show) {
-          z-index: 100;
-        }
-        
-        .compact-form-group:has(.autocomplete-dropdown.show) {
-          z-index: 101;
-          position: relative;
-        }
-
-        .autocomplete-wrapper:has(.autocomplete-dropdown.show) {
-          z-index: 102;
-          position: relative;
-        }
-        
+        .compact-card:has(.autocomplete-dropdown.show) { z-index: 100; }
+        .compact-form-group:has(.autocomplete-dropdown.show) { z-index: 101; position: relative; }
+        .autocomplete-wrapper:has(.autocomplete-dropdown.show) { z-index: 102; position: relative; }
         .compact-card-header {
           font-size: var(--font-size-sm);
           font-weight: 700;
@@ -73,26 +57,13 @@ export function renderCreateTTN() {
           justify-content: space-between;
           align-items: center;
         }
-        
         .compact-grid {
           display: grid;
           grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
           gap: var(--space-sm);
         }
-        
-        .compact-form-group {
-          display: flex;
-          flex-direction: column;
-          gap: 4px;
-        }
-        
-        .compact-label {
-          font-size: 11px;
-          font-weight: 600;
-          color: var(--text-muted);
-          text-transform: uppercase;
-        }
-        
+        .compact-form-group { display: flex; flex-direction: column; gap: 4px; }
+        .compact-label { font-size: 11px; font-weight: 600; color: var(--text-muted); text-transform: uppercase; }
         .compact-input, .compact-select {
           background: var(--bg-input);
           border: 1px solid var(--border-color);
@@ -103,149 +74,26 @@ export function renderCreateTTN() {
           outline: none;
           width: 100%;
         }
-        
-        .compact-input:focus, .compact-select:focus {
-          border-color: var(--accent);
-        }
-        
-        /* Places Table */
-        .places-table {
-          width: 100%;
-          border-collapse: collapse;
-          margin-top: 10px;
-        }
-        
-        .places-table th {
-          text-align: left;
-          font-size: 11px;
-          color: var(--text-muted);
-          padding: 8px;
-          font-weight: 600;
-          text-transform: uppercase;
-        }
-        
-        .places-table td {
-          padding: 4px;
-          vertical-align: middle;
-        }
-        
-        .dimension-input-group {
-          display: grid;
-          grid-template-columns: repeat(3, 1fr);
-          gap: 4px;
-        }
-        
-        /* SpecialCargo Switch */
-        .switch {
-          position: relative;
-          display: inline-block;
-          width: 36px;
-          height: 20px;
-        }
-        
-        .switch input {
-          opacity: 0;
-          width: 0;
-          height: 0;
-        }
-        
-        .slider {
-          position: absolute;
-          cursor: pointer;
-          top: 0;
-          left: 0;
-          right: 0;
-          bottom: 0;
-          background-color: var(--bg-glass);
-          border: 1px solid var(--border-color);
-          transition: .4s;
-          border-radius: 20px;
-        }
-        
-        .slider:before {
-          position: absolute;
-          content: "";
-          height: 12px;
-          width: 12px;
-          left: 3px;
-          bottom: 3px;
-          background-color: white;
-          transition: .4s;
-          border-radius: 50%;
-          box-shadow: var(--shadow-sm);
-        }
-        
-        input:checked + .slider {
-          background-color: var(--accent);
-          border-color: var(--accent);
-        }
-        
-        input:checked + .slider:before {
-          transform: translateX(16px);
-        }
-        
-        .btn-remove-place {
-          background: rgba(239, 68, 68, 0.1);
-          color: #ef4444;
-          border: 1px solid rgba(239, 68, 68, 0.2);
-          width: 24px;
-          height: 24px;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          border-radius: 4px;
-          cursor: pointer;
-          transition: 0.2s;
-        }
-        
-        .btn-remove-place:hover {
-          background: #ef4444;
-          color: white;
-        }
-        
-        .sidebar-group {
-          margin-bottom: var(--space-md);
-        }
-        
-        .summary-item {
-          display: flex;
-          justify-content: space-between;
-          padding: 8px 0;
-          font-size: var(--font-size-sm);
-        }
-        
-        .summary-label {
-          color: var(--text-muted);
-        }
-        
-        .summary-value {
-          font-weight: 600;
-          color: var(--text-primary);
-        }
-        
-        /* Tabs Styling */
-        .tab-btn {
-          background: var(--bg-glass);
-          border: 1px solid var(--border-color);
-          color: var(--text-muted);
-          cursor: pointer;
-          border-radius: 4px;
-          transition: 0.2s;
-          padding: 6px 16px;
-          font-size: 13px;
-          font-weight: 600;
-        }
-        
-        .tab-btn:hover {
-          background: var(--bg-card-hover);
-          color: var(--text-primary);
-        }
-        
-        .tab-btn.active {
-          background: var(--accent);
-          color: white;
-          border-color: var(--accent);
-        }
+        .compact-input:focus, .compact-select:focus { border-color: var(--accent); }
+        .places-table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+        .places-table th { text-align: left; font-size: 11px; color: var(--text-muted); padding: 8px; font-weight: 600; text-transform: uppercase; }
+        .places-table td { padding: 4px; vertical-align: middle; }
+        .dimension-input-group { display: grid; grid-template-columns: repeat(3, 1fr); gap: 4px; }
+        .switch { position: relative; display: inline-block; width: 36px; height: 20px; }
+        .switch input { opacity: 0; width: 0; height: 0; }
+        .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: var(--bg-glass); border: 1px solid var(--border-color); transition: .4s; border-radius: 20px; }
+        .slider:before { position: absolute; content: ""; height: 12px; width: 12px; left: 3px; bottom: 3px; background-color: white; transition: .4s; border-radius: 50%; box-shadow: var(--shadow-sm); }
+        input:checked + .slider { background-color: var(--accent); border-color: var(--accent); }
+        input:checked + .slider:before { transform: translateX(16px); }
+        .btn-remove-place { background: rgba(239,68,68,0.1); color: #ef4444; border: 1px solid rgba(239,68,68,0.2); width: 24px; height: 24px; display: flex; align-items: center; justify-content: center; border-radius: 4px; cursor: pointer; transition: 0.2s; }
+        .btn-remove-place:hover { background: #ef4444; color: white; }
+        .sidebar-group { margin-bottom: var(--space-md); }
+        .summary-item { display: flex; justify-content: space-between; padding: 8px 0; font-size: var(--font-size-sm); }
+        .summary-label { color: var(--text-muted); }
+        .summary-value { font-weight: 600; color: var(--text-primary); }
+        .tab-btn { background: var(--bg-glass); border: 1px solid var(--border-color); color: var(--text-muted); cursor: pointer; border-radius: 4px; transition: 0.2s; padding: 6px 16px; font-size: 13px; font-weight: 600; }
+        .tab-btn:hover { background: var(--bg-card-hover); color: var(--text-primary); }
+        .tab-btn.active { background: var(--accent); color: white; border-color: var(--accent); }
       </style>
 
       <div class="create-ttn-grid">
@@ -254,7 +102,7 @@ export function renderCreateTTN() {
           
           <!-- Package Info -->
           <div class="compact-card">
-            <div class="compact-card-header">Інформація про посилку</div>
+            <div class="compact-card-header">${t('create.package_info')}</div>
             
             <div id="sender-section">
                 <!-- Populated by loadSenderData -->
@@ -263,38 +111,38 @@ export function renderCreateTTN() {
 
             <div class="compact-grid" style="margin-top: var(--space-md); margin-bottom: var(--space-md); grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));">
               <div class="compact-form-group">
-                <label class="compact-label">Тип вантажу <span class="required">*</span></label>
+                <label class="compact-label">${t('create.cargo_type')} <span class="required">*</span></label>
                 <select class="compact-select" id="cargo-type">
-                  <option value="Parcel">Посилка</option>
-                  <option value="Cargo">Вантаж</option>
-                  <option value="TiresWheels">Шини та диски</option>
-                  <option value="Documents">Документи</option>
+                  <option value="Parcel">${t('create.cargo_types.Parcel')}</option>
+                  <option value="Cargo">${t('create.cargo_types.Cargo')}</option>
+                  <option value="TiresWheels">${t('create.cargo_types.TiresWheels')}</option>
+                  <option value="Documents">${t('create.cargo_types.Documents')}</option>
                 </select>
               </div>
               <div class="compact-form-group">
-                <label class="compact-label">Платник <span class="required">*</span></label>
+                <label class="compact-label">${t('create.payer')} <span class="required">*</span></label>
                 <select class="compact-select" id="payer-type">
-                  <option value="Recipient" selected>Отримувач</option>
-                  <option value="Sender">Відправник</option>
-                  <option value="ThirdPerson">Третя особа</option>
+                  <option value="Recipient" selected>${t('create.payer_types.Recipient')}</option>
+                  <option value="Sender">${t('create.payer_types.Sender')}</option>
+                  <option value="ThirdPerson">${t('create.payer_types.ThirdPerson')}</option>
                 </select>
               </div>
               <div class="compact-form-group">
-                <label class="compact-label">Форма оплати <span class="required">*</span></label>
+                <label class="compact-label">${t('create.payment_method')} <span class="required">*</span></label>
                 <select class="compact-select" id="payment-method">
-                  <option value="Cash" selected>Готівкова</option>
-                  <option value="NonCash">Безготівкова</option>
+                  <option value="Cash" selected>${t('create.payment_methods.Cash')}</option>
+                  <option value="NonCash">${t('create.payment_methods.NonCash')}</option>
                 </select>
               </div>
             </div>
             <div class="compact-form-group" id="cargo-desc-group">
-              <label class="compact-label">Опис вантажу <span class="required">*</span></label>
+              <label class="compact-label">${t('create.cargo_description')} <span class="required">*</span></label>
               <!-- autocomplete injected here -->
             </div>
             
             <!-- Hidden details for tires/wheels -->
             <div id="tires-wheels-group" style="display:none; margin-top: var(--space-sm);">
-                <label class="compact-label">Вид шини/диска <span class="required">*</span></label>
+                <label class="compact-label">${t('create.cargo_description')} <span class="required">*</span></label>
                 <select class="compact-select" id="tires-wheels-select">
                   <option value="d7c456c5-aa8b-11e3-9fa0-0050568002cf">Шина легкова R 13-14</option>
                   <option value="d7c456c6-aa8b-11e3-9fa0-0050568002cf">Шина легкова R 15-17</option>
@@ -312,12 +160,12 @@ export function renderCreateTTN() {
 
           <!-- Places -->
           <div class="compact-card">
-            <div class="compact-card-header">Місця</div>
+            <div class="compact-card-header">${t('create.places')}</div>
             <table class="places-table">
               <thead>
                 <tr>
-                  <th style="width: 50%;">Розміри, см (Д/Ш/В)</th>
-                  <th style="width: 30%;">Вага, кг</th>
+                  <th style="width: 50%;">${t('create.dimensions')}</th>
+                  <th style="width: 30%;">${t('create.weight')}</th>
                   <th style="width: 20%;"></th>
                 </tr>
               </thead>
@@ -327,14 +175,14 @@ export function renderCreateTTN() {
             </table>
             
             <div style="display: flex; gap: var(--space-sm); margin-top: var(--space-md);">
-              <button class="btn btn-primary btn-sm" id="btn-add-place">+ Додати місце</button>
-              <button class="btn btn-secondary btn-sm" id="btn-calc-price-alt">📊 Розрахувати вартість</button>
+              <button class="btn btn-primary btn-sm" id="btn-add-place">+ ${t('create.add_place')}</button>
+              <button class="btn btn-secondary btn-sm" id="btn-calc-price-alt">📊 ${t('create.calculate_price')}</button>
             </div>
           </div>
           
           <!-- Actions footer -->
           <div class="compact-card" style="display: flex; align-items: center; justify-content: flex-start; gap: var(--space-md);">
-                <button class="btn btn-success" id="submit-ttn-btn" style="background: #f97316; border-color: #ea580c; padding: 10px 40px;">+ Створити НП</button>
+                <button class="btn btn-success" id="submit-ttn-btn" style="background: #f97316; border-color: #ea580c; padding: 10px 40px;">+ ${t('create.create_ttn')}</button>
                 
                 <label class="switch-container" style="display: flex; align-items: center; gap: 8px; margin-left: 10px;">
                     <label class="switch">
@@ -353,62 +201,62 @@ export function renderCreateTTN() {
           <!-- Client/Recipient Card -->
           <div class="compact-card">
             <div class="compact-card-header" style="flex-direction: column; align-items: flex-start; gap: 8px;">
-                <span>Отримувач</span>
+                <span>${t('create.recipient')}</span>
                 <div class="tabs tabs-sm" id="recipient-type-tabs" style="display: flex; gap: 4px; width: 100%;">
-                    <button class="tab-btn active" data-type="PrivatePerson" id="tab-private" style="flex: 1;">👤 Фізична особа</button>
-                    <button class="tab-btn" data-type="Organization" id="tab-fop" style="flex: 1;">🏢 Юр. особа / ФОП</button>
+                    <button class="tab-btn active" data-type="PrivatePerson" id="tab-private" style="flex: 1;">👤 ${t('create.private_person')}</button>
+                    <button class="tab-btn" data-type="Organization" id="tab-fop" style="flex: 1;">🏢 ${t('create.organization')}</button>
                 </div>
             </div>
             
             <div id="recipient-fields-container">
                 <div id="recipient-private-form">
                     <div class="compact-form-group sidebar-group">
-                        <label class="compact-label">ФІО отримувача <span class="required">*</span></label>
-                        <input type="text" class="compact-input" id="recipient-fullname" placeholder="Н-р: Іванов Іван Іванович">
+                        <label class="compact-label">${t('create.recipient_fullname')} <span class="required">*</span></label>
+                        <input type="text" class="compact-input" id="recipient-fullname" placeholder="${t('create.recipient_fullname_placeholder')}">
                     </div>
                 </div>
 
                 <div id="recipient-fop-form" style="display:none;">
                     <div class="compact-form-group sidebar-group">
-                        <label class="compact-label">Код ЄДРПОУ <span class="required">*</span></label>
+                        <label class="compact-label">${t('create.edrpou')} <span class="required">*</span></label>
                         <input type="text" class="compact-input" id="recipient-edrpou" placeholder="12345678">
                     </div>
                     <div class="compact-form-group sidebar-group">
-                        <label class="compact-label">Назва організації / ФОП</label>
-                        <input type="text" class="compact-input" id="recipient-fop-name" placeholder="Назва">
+                        <label class="compact-label">${t('create.organization_name')}</label>
+                        <input type="text" class="compact-input" id="recipient-fop-name" placeholder="${t('create.organization_name')}">
                     </div>
                     <div class="compact-form-group sidebar-group" style="display: grid; grid-template-columns: 1fr 1fr; gap: 4px;">
                         <div>
-                            <label class="compact-label">Прізвище конт. особи</label>
-                            <input type="text" class="compact-input" id="recipient-fop-contact-lastname" placeholder="Прізвище">
+                            <label class="compact-label">${t('create.contact_lastname')}</label>
+                            <input type="text" class="compact-input" id="recipient-fop-contact-lastname" placeholder="${t('create.contact_lastname')}">
                         </div>
                         <div>
-                            <label class="compact-label">Ім'я конт. особи</label>
-                            <input type="text" class="compact-input" id="recipient-fop-contact-firstname" placeholder="Ім'я">
+                            <label class="compact-label">${t('create.contact_firstname')}</label>
+                            <input type="text" class="compact-input" id="recipient-fop-contact-firstname" placeholder="${t('create.contact_firstname')}">
                         </div>
                     </div>
                 </div>
                 
                 <div class="compact-form-group sidebar-group">
-                    <label class="compact-label">Телефон отримувача <span class="required">*</span></label>
+                    <label class="compact-label">${t('create.recipient_phone')} <span class="required">*</span></label>
                     <input type="tel" class="compact-input" id="recipient-phone" placeholder="+38 (___) ___-__-__">
                 </div>
             </div>
 
             <div class="compact-form-group sidebar-group">
-                <label class="compact-label">Спосіб доставки <span class="required">*</span></label>
+                <label class="compact-label">${t('create.delivery_method')} <span class="required">*</span></label>
                 <select class="compact-select" id="service-type">
-                  <option value="WarehouseWarehouse">НП до відділення</option>
-                  <option value="WarehouseDoors">Кур'єром на адресу</option>
-                  <option value="DoorsWarehouse">Адреса → Відділення</option>
-                  <option value="DoorsDoors">Адреса → Адреса</option>
+                  <option value="WarehouseWarehouse">${t('create.delivery_methods.WarehouseWarehouse')}</option>
+                  <option value="WarehouseDoors">${t('create.delivery_methods.WarehouseDoors')}</option>
+                  <option value="DoorsWarehouse">${t('create.delivery_methods.DoorsWarehouse')}</option>
+                  <option value="DoorsDoors">${t('create.delivery_methods.DoorsDoors')}</option>
                 </select>
             </div>
 
             <div class="compact-form-group sidebar-group">
                 <div style="display: flex; justify-content: space-between; align-items: center;">
-                    <label class="compact-label">Адреса доставки <span class="required">*</span></label>
-                    <button class="btn btn-ghost btn-sm" id="open-map-btn" style="padding: 0; font-size: 10px;">🗺️ Карта</button>
+                    <label class="compact-label">${t('create.delivery_address')} <span class="required">*</span></label>
+                    <button class="btn btn-ghost btn-sm" id="open-map-btn" style="padding: 0; font-size: 10px;">🗺️ ${t('create.map')}</button>
                 </div>
                 <div id="recipient-city-group" style="margin-bottom: 4px;">
                     <!-- city AC -->
@@ -428,17 +276,17 @@ export function renderCreateTTN() {
 
           <!-- Amounts card -->
           <div class="compact-card">
-            <div class="compact-card-header">Суми</div>
+            <div class="compact-card-header">${t('create.amounts')}</div>
             
             <div class="summary-list">
                 <div class="compact-form-group" style="margin-top: 10px;">
-                    <label class="compact-label">Оголошена цінність, UAH <span class="required">*</span></label>
+                    <label class="compact-label">${t('create.declared_value')} <span class="required">*</span></label>
                     <input type="number" class="compact-input" id="cargo-cost" value="200" placeholder="200">
                 </div>
                 
                 <div class="compact-form-group" style="margin-top: 10px;">
                     <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 4px;">
-                        <label class="compact-label" style="margin: 0; cursor: pointer;" for="backward-enabled">Зворотна доставка</label>
+                        <label class="compact-label" style="margin: 0; cursor: pointer;" for="backward-enabled">${t('create.backward_delivery')}</label>
                         <label class="switch">
                             <input type="checkbox" id="backward-enabled">
                             <span class="slider"></span>
@@ -448,7 +296,7 @@ export function renderCreateTTN() {
                 
                 <div id="backward-value-container" style="display: none;">
                     <div class="compact-form-group">
-                        <label class="compact-label">Сума післяплати, UAH <span class="required">*</span></label>
+                        <label class="compact-label">${t('create.backward_value')} <span class="required">*</span></label>
                         <div style="display: flex; align-items: center; gap: 8px;">
                             <input type="number" class="compact-input" id="backward-value" value="0">
                             <span style="font-size: 12px; font-weight: 600;">UAH</span>
@@ -457,17 +305,17 @@ export function renderCreateTTN() {
                 </div>
 
                 <div class="compact-form-group" style="margin-top: 10px; padding-top: 10px; border-top: 1px dashed var(--border-color);">
-                    <div class="summary-item"><span class="summary-label">Послуга:</span> <span class="summary-value" id="sum-service">—</span></div>
-                    <div class="summary-item"><span class="summary-label">Платник:</span> <span class="summary-value" id="sum-payer">—</span></div>
-                    <div class="summary-item"><span class="summary-label">Оплата:</span> <span class="summary-value" id="sum-payment">—</span></div>
-                    <div class="summary-item"><span class="summary-label">Вага:</span> <span class="summary-value" id="sum-weight">0 кг</span></div>
-                    <div class="summary-item" id="sum-backward-row" style="display: none;"><span class="summary-label">Післяплата:</span> <span class="summary-value" id="sum-backward">—</span></div>
+                    <div class="summary-item"><span class="summary-label">${t('create.service')}:</span> <span class="summary-value" id="sum-service">—</span></div>
+                    <div class="summary-item"><span class="summary-label">${t('create.payer')}:</span> <span class="summary-value" id="sum-payer">—</span></div>
+                    <div class="summary-item"><span class="summary-label">${t('create.payment_method')}:</span> <span class="summary-value" id="sum-payment">—</span></div>
+                    <div class="summary-item"><span class="summary-label">${t('create.weight_sum')}:</span> <span class="summary-value" id="sum-weight">0 кг</span></div>
+                    <div class="summary-item" id="sum-backward-row" style="display: none;"><span class="summary-label">${t('create.backward_sum')}:</span> <span class="summary-value" id="sum-backward">—</span></div>
                 </div>
             </div>
 
             
             <div id="price-estimate" style="margin-top: 15px;">
-                <button class="btn btn-ghost btn-sm btn-block" id="calc-price-btn">💲 Розрахувати вартість доставки</button>
+                <button class="btn btn-ghost btn-sm btn-block" id="calc-price-btn">💲 ${t('create.calc_delivery_cost')}</button>
             </div>
           </div>
 
@@ -487,4 +335,3 @@ export function renderCreateTTN() {
     </div>
   `;
 }
-
