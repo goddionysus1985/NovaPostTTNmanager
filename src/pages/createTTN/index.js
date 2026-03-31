@@ -137,7 +137,13 @@ function updateDimensionsContainer() {
                 </div>
               </td>
               <td>
-                   <input type="number" class="compact-input cargo-weight-place" value="${place.weight}" placeholder="Вес, кг">
+                   <div style="display: flex; align-items: center; gap: 8px;">
+                       <input type="number" class="compact-input cargo-weight-place" value="${place.weight}" placeholder="Вес, кг" style="flex: 1;">
+                       <label class="switch" title="SpecialCargo (РО)">
+                           <input type="checkbox" class="special-cargo-toggle" ${place.specialCargo ? 'checked' : ''}>
+                           <span class="slider"></span>
+                       </label>
+                   </div>
               </td>
               <td>
                   ${index > 0 ? `<button class="btn-remove-place" data-index="${index}">✕</button>` : ''}
@@ -157,6 +163,7 @@ function updateDimensionsContainer() {
                 state.places[idx].width = row.querySelector('.cargo-width').value;
                 state.places[idx].height = row.querySelector('.cargo-height').value;
                 state.places[idx].weight = row.querySelector('.cargo-weight-place').value;
+                state.places[idx].specialCargo = row.querySelector('.special-cargo-toggle').checked;
                 
                 checkSpecialCargo();
                 updateSummary();
@@ -184,8 +191,7 @@ function updateDimensionsContainer() {
  * If any place is SpecialCargo, ship type must be "Cargo"
  */
 function checkSpecialCargo() {
-    const globalSCToggle = document.getElementById('special-cargo-toggle-global');
-    const isAnySpecial = globalSCToggle?.checked || false;
+    const isAnySpecial = state.places.some(p => p.specialCargo);
     const cargoTypeEl = document.getElementById('cargo-type');
     if (cargoTypeEl) {
         if (isAnySpecial) {
@@ -194,7 +200,7 @@ function checkSpecialCargo() {
                 updateSummary();
             }
         } else {
-            // Revert to Parcel if special cargo was disabled
+            // Revert to Parcel if special cargo was disabled for ALL places
             if (cargoTypeEl.value === 'Cargo') {
                 cargoTypeEl.value = 'Parcel';
                 updateSummary();
@@ -253,14 +259,7 @@ export function initCreateTTN(navigateTo) {
         });
     });
 
-    // Global SpecialCargo toggle
-    const globalSCToggle = document.getElementById('special-cargo-toggle-global');
-    if (globalSCToggle) {
-        globalSCToggle.addEventListener('change', () => {
-            checkSpecialCargo();
-            updateSummary();
-        });
-    }
+    // Removed global SpecialCargo toggle listener
 
     // Add place button
     const addPlaceBtn = document.getElementById('btn-add-place');

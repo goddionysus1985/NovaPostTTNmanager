@@ -1,4 +1,4 @@
-﻿import { hasApiKey } from '../../api/novaposhta.js';
+import { hasApiKey } from '../../api/novaposhta.js';
 import { state } from './state.js';
 import { html } from '../../utils/dom.js';
 import { t } from '../../utils/i18n.js';
@@ -183,14 +183,6 @@ export function renderCreateTTN() {
           <!-- Actions footer -->
           <div class="compact-card" style="display: flex; align-items: center; justify-content: flex-start; gap: var(--space-md);">
                 <button class="btn btn-success" id="submit-ttn-btn" style="background: #f97316; border-color: #ea580c; padding: 10px 40px;">+ ${t('create.create_ttn')}</button>
-                
-                <label class="switch-container" style="display: flex; align-items: center; gap: 8px; margin-left: 10px;">
-                    <label class="switch">
-                        <input type="checkbox" id="special-cargo-toggle-global">
-                        <span class="slider"></span>
-                    </label>
-                    <span style="font-size: 11px; color: var(--text-muted);">SpecialCargo (РО)</span>
-                </label>
           </div>
 
         </div>

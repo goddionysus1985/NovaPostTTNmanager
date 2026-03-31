@@ -218,9 +218,12 @@ async function buildDoorAddress(recipientRef) {
  * @param {string} description
  * @returns {{ optionsSeat: object[], hasContent: boolean }}
  */
-function buildOptionsSeat(isSpecialCargo, totalWeight, totalCost, description) {
+function buildOptionsSeat(totalWeight, totalCost, description) {
     const container = document.getElementById('dimensions-container');
     if (!container) return { optionsSeat: [], hasContent: false };
+    
+    // We'll track if any seat is actually special cargo to inform hasContent
+    let hasAnySpecialCargo = false;
 
     const rows = container.querySelectorAll('.dimension-row');
     const rowCount = rows.length || 1;
@@ -239,6 +242,7 @@ function buildOptionsSeat(isSpecialCargo, totalWeight, totalCost, description) {
         const l = row.querySelector('.cargo-length')?.value;
         const h = row.querySelector('.cargo-height')?.value;
         const pWeight = row.querySelector('.cargo-weight-place')?.value;
+        const isPlaceSpecialCargo = row.querySelector('.special-cargo-toggle')?.checked || false;
 
         const seat = { weight: parseFloat(pWeight || defaultWeight) };
         if (pWeight) hasIndividualWeights = true;
@@ -252,7 +256,7 @@ function buildOptionsSeat(isSpecialCargo, totalWeight, totalCost, description) {
                 (seat.volumetricWidth * seat.volumetricLength * seat.volumetricHeight / 4000).toFixed(4)
             );
 
-            if (isSpecialCargo) {
+            if (isPlaceSpecialCargo) {
                 const exceeds = seat.volumetricLength > 120 || seat.volumetricWidth > 70 ||
                     seat.volumetricHeight > 70 || seat.weight > 30;
                 if (exceeds) {
@@ -261,7 +265,8 @@ function buildOptionsSeat(isSpecialCargo, totalWeight, totalCost, description) {
             }
         }
 
-        if (isSpecialCargo) {
+        if (isPlaceSpecialCargo) {
+            hasAnySpecialCargo = true;
             seat.specialCargo = '1';
             seat.cost = defaultCost;
             seat.description = description;
@@ -270,7 +275,7 @@ function buildOptionsSeat(isSpecialCargo, totalWeight, totalCost, description) {
         return seat;
     });
 
-    const hasContent = hasValidDimensions || hasIndividualWeights || isSpecialCargo;
+    const hasContent = hasValidDimensions || hasIndividualWeights || hasAnySpecialCargo;
     return { optionsSeat, hasContent };
 }
 
@@ -413,7 +418,7 @@ export async function submitTTN(navigateTo) {
         }
 
         // ── 6. Build core TTN params ──
-        const isSpecialCargo = document.getElementById('special-cargo-toggle-global')?.checked || false;
+        const isAnySpecialCargo = state.places.some(p => p.specialCargo);
 
         const ttnParams = buildTTNParams({
             serviceType, payerType, paymentMethod, cargoType,
@@ -423,7 +428,7 @@ export async function submitTTN(navigateTo) {
             finalRecipientAddress, descValue,
         });
 
-        if (isSpecialCargo) ttnParams.specialCargo = '1';
+        if (isAnySpecialCargo) ttnParams.specialCargo = '1';
 
         if (isDoorRecipient) {
             ttnParams.RecipientHouse = document.getElementById('recipient-building')?.value?.trim() || '';
@@ -437,7 +442,7 @@ export async function submitTTN(navigateTo) {
                 ttnParams.CargoDetails = [{ CargoDescription: twRef, Amount: seats }];
             }
         } else {
-            const { optionsSeat, hasContent } = buildOptionsSeat(isSpecialCargo, weight, cost, descValue);
+            const { optionsSeat, hasContent } = buildOptionsSeat(weight, cost, descValue);
             if (hasContent) ttnParams.OptionsSeat = optionsSeat;
         }
 
