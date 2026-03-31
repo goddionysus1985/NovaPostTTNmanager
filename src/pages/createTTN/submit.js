@@ -519,6 +519,14 @@ export function showResultModal(docNumber, docRef, printUrl, markingUrl, cost, e
     // Fire confetti! 🎉
     setTimeout(fireConfetti, 50);
 
+    // Play sound! 🔊
+    try {
+        const audio = new Audio('/message-sent.mp3');
+        audio.play().catch(e => console.warn('[Sound] Audio play failed:', e));
+    } catch (err) {
+        console.error('[Sound] Could not play audio:', err);
+    }
+
     overlay.querySelector('#close-result-modal').addEventListener('click', () => overlay.remove());
     overlay.querySelector('#copy-ttn-number').addEventListener('click', () => {
         navigator.clipboard.writeText(docNumber);
